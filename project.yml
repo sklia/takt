@@ -1,0 +1,62 @@
+name: Takt
+options:
+  bundleIdPrefix: app.sklia
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGNING_REQUIRED: YES
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  Takt:
+    type: application
+    platform: macOS
+    sources:
+      - path: Takt
+    info:
+      path: Takt/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleName: Takt
+        CFBundleDisplayName: Takt
+        NSHumanReadableCopyright: ""
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sklia.takt
+        GENERATE_INFOPLIST_FILE: NO
+
+  TaktTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: TaktTests
+    dependencies:
+      - target: Takt
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sklia.takt.tests
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Takt.app/Contents/MacOS/Takt"
+
+schemes:
+  Takt:
+    build:
+      targets:
+        Takt: all
+        TaktTests: [test]
+    test:
+      targets:
+        - TaktTests
+    run:
+      config: Debug
