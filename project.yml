@@ -16,6 +16,8 @@ settings:
     DEVELOPMENT_TEAM: ""
     ENABLE_HARDENED_RUNTIME: YES
     MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "0.0.0" # x-release-please-version
+    CURRENT_PROJECT_VERSION: "1"
 
 targets:
   Takt:
@@ -29,6 +31,8 @@ targets:
         LSUIElement: true
         CFBundleName: Takt
         CFBundleDisplayName: Takt
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSHumanReadableCopyright: ""
     settings:
       base:
