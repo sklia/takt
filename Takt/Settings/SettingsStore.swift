@@ -6,6 +6,11 @@ final class SettingsStore {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private static let narratorEnabledKey = "narratorEnabled"
     @ObservationIgnored private static let hasShownWelcomeSheetKey = "hasShownWelcomeSheet"
+    @ObservationIgnored private static let selectedVoiceIDKey = "selectedVoiceID"
+    @ObservationIgnored private static let speechRateKey = "speechRate"
+    @ObservationIgnored private static let showAllVoicesInPickerKey = "showAllVoicesInPicker"
+
+    static let defaultSpeechRate: Float = 0.52
 
     var narratorEnabled: Bool {
         didSet { defaults.set(narratorEnabled, forKey: Self.narratorEnabledKey) }
@@ -15,9 +20,31 @@ final class SettingsStore {
         didSet { defaults.set(hasShownWelcomeSheet, forKey: Self.hasShownWelcomeSheetKey) }
     }
 
+    var selectedVoiceID: String? {
+        didSet {
+            if let selectedVoiceID {
+                defaults.set(selectedVoiceID, forKey: Self.selectedVoiceIDKey)
+            } else {
+                defaults.removeObject(forKey: Self.selectedVoiceIDKey)
+            }
+        }
+    }
+
+    var speechRate: Float {
+        didSet { defaults.set(speechRate, forKey: Self.speechRateKey) }
+    }
+
+    var showAllVoicesInPicker: Bool {
+        didSet { defaults.set(showAllVoicesInPicker, forKey: Self.showAllVoicesInPickerKey) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.narratorEnabled = defaults.bool(forKey: Self.narratorEnabledKey)
         self.hasShownWelcomeSheet = defaults.bool(forKey: Self.hasShownWelcomeSheetKey)
+        self.selectedVoiceID = defaults.string(forKey: Self.selectedVoiceIDKey)
+        let storedRate = defaults.object(forKey: Self.speechRateKey) as? Float
+        self.speechRate = storedRate ?? Self.defaultSpeechRate
+        self.showAllVoicesInPicker = defaults.bool(forKey: Self.showAllVoicesInPickerKey)
     }
 }

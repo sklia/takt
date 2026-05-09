@@ -2,17 +2,85 @@ import AppKit
 import SwiftUI
 
 struct SettingsView: View {
+    @Bindable var settings: SettingsStore
     @Bindable var permission: PermissionStateStore
+    let voiceCatalog: VoiceCatalog
+    let preview: (SpeechSettings) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        Form {
             if permission.state == .denied {
-                PermissionBanner()
+                Section {
+                    PermissionBanner()
+                }
             }
-            Spacer()
+            Section("Voice") {
+                VoicePicker(settings: settings, voiceCatalog: voiceCatalog)
+                Toggle("Show all voices", isOn: $settings.showAllVoicesInPicker)
+                HStack {
+                    Spacer()
+                    Button("Preview") {
+                        preview(SpeechSettings(
+                            voiceIdentifier: settings.selectedVoiceID,
+                            rate: settings.speechRate
+                        ))
+                    }
+                }
+            }
+            Section("Speech rate") {
+                HStack {
+                    Text("Slow")
+                        .foregroundStyle(.secondary)
+                    Slider(value: $settings.speechRate, in: 0.45...0.6)
+                    Text("Fast")
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
-        .padding(20)
-        .frame(width: 480, height: 320)
+        .formStyle(.grouped)
+        .frame(width: 480, height: 420)
+    }
+}
+
+private struct VoicePicker: View {
+    @Bindable var settings: SettingsStore
+    let voiceCatalog: VoiceCatalog
+
+    var body: some View {
+        Picker("Voice", selection: $settings.selectedVoiceID) {
+            Text("System default").tag(String?.none)
+            ForEach(displayGroups, id: \.label) { group in
+                Section(group.label) {
+                    ForEach(group.voices, id: \.identifier) { voice in
+                        Text(voice.name).tag(String?.some(voice.identifier))
+                    }
+                }
+            }
+        }
+    }
+
+    private var displayGroups: [(label: String, voices: [VoiceInfo])] {
+        let allGroups = voiceCatalog.voices(showAll: settings.showAllVoicesInPicker, locale: Locale.current)
+        let recommended = allGroups
+            .filter { [.siri, .premium, .enhanced].contains($0.tier) }
+            .flatMap(\.voices)
+        let other = allGroups
+            .filter { $0.tier == .standard }
+            .flatMap(\.voices)
+        let novelty = allGroups
+            .filter { $0.tier == .novelty }
+            .flatMap(\.voices)
+        var result: [(String, [VoiceInfo])] = []
+        if !recommended.isEmpty {
+            result.append(("Recommended (Siri / Premium)", recommended))
+        }
+        if !other.isEmpty {
+            result.append(("Other", other))
+        }
+        if !novelty.isEmpty {
+            result.append(("Novelty", novelty))
+        }
+        return result
     }
 }
 
@@ -30,9 +98,6 @@ private struct PermissionBanner: View {
                 .fixedSize(horizontal: false, vertical: true)
             Button("Open System Settings", action: openAutomationSettings)
         }
-        .padding(12)
-        .background(Color.orange.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

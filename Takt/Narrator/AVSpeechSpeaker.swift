@@ -11,9 +11,10 @@ final class AVSpeechSpeaker: NSObject, @unchecked Sendable, Speaker, AVSpeechSyn
         synthesizer.delegate = self
     }
 
-    func speak(_ phrase: String) async {
+    func speak(_ phrase: String, settings: SpeechSettings) async {
         let utterance = AVSpeechUtterance(string: phrase)
-        utterance.voice = Self.bestVoiceForCurrentLocale()
+        utterance.voice = Self.voice(for: settings.voiceIdentifier)
+        utterance.rate = settings.rate
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             lock.lock()
             continuation = cont
@@ -40,6 +41,13 @@ final class AVSpeechSpeaker: NSObject, @unchecked Sendable, Speaker, AVSpeechSyn
         continuation = nil
         lock.unlock()
         cont?.resume()
+    }
+
+    private static func voice(for identifier: String?) -> AVSpeechSynthesisVoice? {
+        if let identifier, let voice = AVSpeechSynthesisVoice(identifier: identifier) {
+            return voice
+        }
+        return bestVoiceForCurrentLocale()
     }
 
     private static func bestVoiceForCurrentLocale() -> AVSpeechSynthesisVoice? {
