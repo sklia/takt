@@ -28,17 +28,10 @@ final class MenuBarController {
         guard let button = statusItem.button else { return }
         button.target = self
         button.action = #selector(handleClick)
-        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
     }
 
     @objc private func handleClick() {
-        if NSApp.currentEvent?.type == .rightMouseUp {
-            showMenu()
-        } else if permission.state == .denied {
-            openSettingsWindow()
-        } else {
-            settings.narratorEnabled.toggle()
-        }
+        showMenu()
     }
 
     private func showMenu() {
