@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0](https://github.com/sklia/takt/compare/v0.2.0...v0.3.0) (2026-05-09)
+
+
+### Features
+
+* **narrator:** ducking safety ([#37](https://github.com/sklia/takt/issues/37)) ([bfff52f](https://github.com/sklia/takt/commit/bfff52f5b11f9f1adce01042c0e5940b9b3284a2))
+* **narrator:** ducking safety with persist and timeout ([bfff52f](https://github.com/sklia/takt/commit/bfff52f5b11f9f1adce01042c0e5940b9b3284a2))
+* **narrator:** Focus mode suppression ([#40](https://github.com/sklia/takt/issues/40)) ([46ad1ff](https://github.com/sklia/takt/commit/46ad1ffef9f8136660cb5e4dcccf944bbb99e560))
+* **narrator:** periodic permission re-check on foreground ([aa7febb](https://github.com/sklia/takt/commit/aa7febb2d569be29d7d371b8647fc7caf36f55b6))
+* **narrator:** permission re-check ([#39](https://github.com/sklia/takt/issues/39)) ([aa7febb](https://github.com/sklia/takt/commit/aa7febb2d569be29d7d371b8647fc7caf36f55b6))
+* **narrator:** suppress narration during Focus modes ([46ad1ff](https://github.com/sklia/takt/commit/46ad1ffef9f8136660cb5e4dcccf944bbb99e560))
+* **shell:** left-click opens menu ([#35](https://github.com/sklia/takt/issues/35)) ([005b528](https://github.com/sklia/takt/commit/005b52846bbeb6f8d8c3cdcdfcd3d2e5c2077109))
+* **updates:** sparkle auto-update with appcast pipeline ([#41](https://github.com/sklia/takt/issues/41)) ([30bd502](https://github.com/sklia/takt/commit/30bd502e2d5e3aa5de20163e9d9e7ca42326b884))
+
+
+### Code Refactoring
+
+* **narrator:** extract MusicSource protocol ([#38](https://github.com/sklia/takt/issues/38)) ([d790c97](https://github.com/sklia/takt/commit/d790c97c83b8cabdb6eefbfb8d51d73627176976))
+
 ## [0.2.0](https://github.com/sklia/takt/compare/v0.1.0...v0.2.0) (2026-05-09)
 
 
