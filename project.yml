@@ -48,6 +48,9 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSHumanReadableCopyright: ""
         NSAppleEventsUsageDescription: Takt lowers Spotify's volume during track announcements.
+        SUFeedURL: https://takt.sklia.app/appcast.xml
+        SUPublicEDKey: +9YeaGZpLQ+pTCmqxrE+OdcnAR616twICMrX91flRuk=
+        SUEnableAutomaticChecks: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.sklia.takt

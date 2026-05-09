@@ -26,11 +26,11 @@
 	<string>Takt lowers Spotify's volume during track announcements.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://takt.sklia.app/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>+9YeaGZpLQ+pTCmqxrE+OdcnAR616twICMrX91flRuk=</string>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
 </dict>
 </plist>
