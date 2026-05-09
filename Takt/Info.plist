@@ -27,7 +27,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
 	<key>SUFeedURL</key>
-	<string>https://sklia.github.io/takt/appcast.xml</string>
+	<string>https://takt.sklia.app/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>+9YeaGZpLQ+pTCmqxrE+OdcnAR616twICMrX91flRuk=</string>
 	<key>SUEnableAutomaticChecks</key>
