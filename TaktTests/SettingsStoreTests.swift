@@ -79,4 +79,14 @@ final class SettingsStoreTests: XCTestCase {
         SettingsStore(defaults: defaults).showAllVoicesInPicker = true
         XCTAssertTrue(SettingsStore(defaults: defaults).showAllVoicesInPicker)
     }
+
+    func test_hasShownVoiceQualityNudge_defaultsToFalse() {
+        XCTAssertFalse(SettingsStore(defaults: makeDefaults()).hasShownVoiceQualityNudge)
+    }
+
+    func test_hasShownVoiceQualityNudge_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hasShownVoiceQualityNudge = true
+        XCTAssertTrue(SettingsStore(defaults: defaults).hasShownVoiceQualityNudge)
+    }
 }

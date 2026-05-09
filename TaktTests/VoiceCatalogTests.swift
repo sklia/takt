@@ -92,4 +92,15 @@ final class VoiceCatalogTests: XCTestCase {
             "com.apple.voice.premium.fr-FR.Amelie"
         )
     }
+
+    func test_tier_forVoiceID_returnsStoredTier() {
+        let catalog = VoiceCatalog(provider: { Self.stub })
+        XCTAssertEqual(catalog.tier(for: "com.apple.voice.tts.en-US.helena"), .siri)
+        XCTAssertEqual(catalog.tier(for: "com.apple.voice.compact.en-US.Samantha"), .standard)
+    }
+
+    func test_tier_forUnknownVoiceID_returnsStandard() {
+        let catalog = VoiceCatalog(provider: { Self.stub })
+        XCTAssertEqual(catalog.tier(for: "unknown.voice.id"), .standard)
+    }
 }
