@@ -1,6 +1,6 @@
 import Foundation
 
-final class PlaybackObserver {
+final class SpotifySource: MusicSource {
     static let notificationName = Notification.Name("com.spotify.client.PlaybackStateChanged")
 
     private let center: DistributedNotificationCenter

@@ -7,7 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var settings: SettingsStore?
     private(set) var voiceCatalog: VoiceCatalog?
     private var engine: NarratorEngine?
-    private var observer: PlaybackObserver?
+    private var observer: (any MusicSource)?
     private var menuBar: MenuBarController?
     private var firstRunSheet: FirstRunSheet?
     private var previewSpeaker: AVSpeechSpeaker?
@@ -41,7 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         )
-        let observer = PlaybackObserver()
+        let observer = SpotifySource()
         let menuBar = MenuBarController(
             settings: settings,
             permission: permissionStore,
