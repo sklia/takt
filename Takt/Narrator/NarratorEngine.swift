@@ -8,10 +8,11 @@ enum PermissionState: Sendable, Equatable {
 
 final class NarratorEngine {
     typealias SpeechSettingsProvider = @Sendable () -> SpeechSettings
+    typealias DuckingLevelProvider = @Sendable () -> Float
 
     private let speaker: any Speaker
     private let ducker: any Ducker
-    private let duckingLevel: Float
+    private let duckingLevelProvider: DuckingLevelProvider
     private let debounce: Duration
     private let speechSettings: SpeechSettingsProvider
     private let permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)?
@@ -26,14 +27,14 @@ final class NarratorEngine {
     init(
         speaker: any Speaker,
         ducker: any Ducker,
-        duckingLevel: Float = 0.25,
+        duckingLevel: @escaping DuckingLevelProvider = { 0.25 },
         debounce: Duration = .milliseconds(250),
         speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
         permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)? = nil
     ) {
         self.speaker = speaker
         self.ducker = ducker
-        self.duckingLevel = duckingLevel
+        self.duckingLevelProvider = duckingLevel
         self.debounce = debounce
         self.speechSettings = speechSettings
         self.permissionStateChangeHandler = permissionStateChangeHandler
@@ -55,7 +56,7 @@ final class NarratorEngine {
             return
         }
         do {
-            try ducker.duck(to: duckingLevel)
+            try ducker.duck(to: duckingLevelProvider())
         } catch {
             transition(to: .denied)
             return

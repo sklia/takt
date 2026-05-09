@@ -83,7 +83,7 @@ final class NarratorEngineTests: XCTestCase {
         NarratorEngine(
             speaker: SpeakerSpy(log: log),
             ducker: DuckerSpy(log: log),
-            duckingLevel: 0.25,
+            duckingLevel: { 0.25 },
             debounce: Self.testDebounce
         )
     }
@@ -137,7 +137,7 @@ final class NarratorEngineTests: XCTestCase {
         let engine = NarratorEngine(
             speaker: SpeakerSpy(log: log),
             ducker: ducker,
-            duckingLevel: 0.25,
+            duckingLevel: { 0.25 },
             debounce: Self.testDebounce
         )
 
@@ -159,7 +159,7 @@ final class NarratorEngineTests: XCTestCase {
         let engine = NarratorEngine(
             speaker: SpeakerSpy(log: log),
             ducker: ducker,
-            duckingLevel: 0.25,
+            duckingLevel: { 0.25 },
             debounce: Self.testDebounce
         )
 
@@ -180,7 +180,7 @@ final class NarratorEngineTests: XCTestCase {
         let engine = NarratorEngine(
             speaker: speaker,
             ducker: DuckerSpy(log: log),
-            duckingLevel: 0.25,
+            duckingLevel: { 0.25 },
             debounce: Self.testDebounce
         )
 
@@ -207,7 +207,7 @@ final class NarratorEngineTests: XCTestCase {
         let engine = NarratorEngine(
             speaker: speaker,
             ducker: DuckerSpy(log: log),
-            duckingLevel: 0.25,
+            duckingLevel: { 0.25 },
             debounce: Self.testDebounce,
             speechSettings: { box.current }
         )

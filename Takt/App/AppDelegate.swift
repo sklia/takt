@@ -13,19 +13,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var previewSpeaker: AVSpeechSpeaker?
     private var settingsWindow: SettingsWindow?
     private var voiceQualityNudge: VoiceQualityNudge?
+    private var loginItem: LoginItemController?
+    private var globalHotkey: GlobalHotkey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = SettingsStore()
         let permissionStore = PermissionStateStore()
         let voiceCatalog = VoiceCatalog()
+        let loginItem = LoginItemController()
         let previewSpeaker = AVSpeechSpeaker()
         let speechSettings: NarratorEngine.SpeechSettingsProvider = { [weak settings] in
             guard let settings else { return SpeechSettings(voiceIdentifier: nil, rate: 0.5) }
             return SpeechSettings(voiceIdentifier: settings.selectedVoiceID, rate: settings.speechRate)
         }
+        let duckingLevelProvider: NarratorEngine.DuckingLevelProvider = { [weak settings] in
+            settings?.duckingLevel ?? SettingsStore.defaultDuckingLevel
+        }
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
             ducker: SpotifyDucker(),
+            duckingLevel: duckingLevelProvider,
             speechSettings: speechSettings,
             permissionStateChangeHandler: { [weak permissionStore] newState in
                 Task { @MainActor in
@@ -43,6 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settingsWindow = SettingsWindow(
             settings: settings,
             permission: permissionStore,
+            loginItem: loginItem,
             voiceCatalog: voiceCatalog,
             preview: { [weak previewSpeaker] speech in
                 guard let previewSpeaker else { return }
@@ -56,6 +64,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             voiceCatalog: voiceCatalog,
             openSettings: { [weak settingsWindow] in settingsWindow?.show() }
         )
+        let globalHotkey = GlobalHotkey(toggle: { [weak settings, weak permissionStore] in
+            guard let settings, let permissionStore else { return }
+            guard permissionStore.state != .denied else { return }
+            settings.narratorEnabled.toggle()
+        })
 
         self.settings = settings
         self.permissionStore = permissionStore
@@ -67,6 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.previewSpeaker = previewSpeaker
         self.settingsWindow = settingsWindow
         self.voiceQualityNudge = voiceQualityNudge
+        self.loginItem = loginItem
+        self.globalHotkey = globalHotkey
 
         applyNarratorState()
         observeSettings()
