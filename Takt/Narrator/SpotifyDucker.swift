@@ -6,10 +6,18 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
         case spotifyUnreachable
     }
 
+    private static let savedVolumeKey = "ducking.savedVolume"
+
     private let bundleIdentifier = "com.spotify.client"
+    private let defaults: UserDefaults
     private let lock = NSLock()
     private var savedVolume: Int?
     private var lastEventError: Error?
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        super.init()
+    }
 
     private lazy var app: SBApplication? = {
         let app = SBApplication(bundleIdentifier: bundleIdentifier)
@@ -31,6 +39,7 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
         lock.lock()
         savedVolume = current
         lock.unlock()
+        defaults.set(current, forKey: Self.savedVolumeKey)
 
         lastEventError = nil
         app.setValue(Int((Float(current) * level).rounded()), forKey: "soundVolume")
@@ -44,6 +53,7 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
         let saved = savedVolume
         savedVolume = nil
         lock.unlock()
+        defaults.removeObject(forKey: Self.savedVolumeKey)
 
         if let saved {
             lastEventError = nil
@@ -62,6 +72,14 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
         if lastEventError != nil {
             throw DuckerError.spotifyUnreachable
         }
+    }
+
+    static func restoreIfNeeded(defaults: UserDefaults = .standard) {
+        guard let volume = defaults.object(forKey: savedVolumeKey) as? Int else { return }
+        defaults.removeObject(forKey: savedVolumeKey)
+        guard let app = SBApplication(bundleIdentifier: "com.spotify.client"),
+              app.isRunning else { return }
+        app.setValue(volume, forKey: "soundVolume")
     }
 
     // SBApplicationDelegate: ScriptingBridge calls this synchronously when an
