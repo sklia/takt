@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Takt</title>
+    <item>
+      <title>Version 0.3.1</title>
+      <pubDate>Sat, 09 May 2026 20:59:34 +0000</pubDate>
+      <sparkle:version>0.3.1</sparkle:version>
+      <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/sklia/takt/releases/download/v0.3.1/Takt.dmg"
+                 sparkle:edSignature="37/gbfSzZk5ZFkEUkDnLTXFIR9oHOXUKlFkl5CBGnHBzQkUh/OOKF+X6QV+LAIaRoWnludDG4x+Pu5WgcHlXAQ=="
+                 length="1874180"
+                 type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
