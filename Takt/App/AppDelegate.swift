@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var settings: SettingsStore?
     private(set) var voiceCatalog: VoiceCatalog?
     private var engine: NarratorEngine?
+    private var ducker: SpotifyDucker?
     private var observer: (any MusicSource)?
     private var menuBar: MenuBarController?
     private var firstRunSheet: FirstRunSheet?
@@ -30,9 +31,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let duckingLevelProvider: NarratorEngine.DuckingLevelProvider = { [weak settings] in
             settings?.duckingLevel ?? SettingsStore.defaultDuckingLevel
         }
+        let ducker = SpotifyDucker()
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
-            ducker: SpotifyDucker(),
+            ducker: ducker,
             duckingLevel: duckingLevelProvider,
             speechSettings: speechSettings,
             permissionStateChangeHandler: { [weak permissionStore] newState in
@@ -75,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.permissionStore = permissionStore
         self.voiceCatalog = voiceCatalog
         self.engine = engine
+        self.ducker = ducker
         self.observer = observer
         self.menuBar = menuBar
         self.firstRunSheet = firstRunSheet
@@ -86,6 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         applyNarratorState()
         observeSettings()
+        observePermission()
         firstRunSheet.presentIfNeeded()
     }
 
@@ -99,6 +103,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             observer.start { event in engine.handle(event) }
         } else {
             observer.stop()
+        }
+    }
+
+    private func observePermission() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, let ducker = self.ducker, let store = self.permissionStore else { return }
+            let probed = ducker.probePermission()
+            guard probed != .unknown else { return }
+            store.state = probed
         }
     }
 

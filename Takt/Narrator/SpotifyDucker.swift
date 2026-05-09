@@ -74,6 +74,13 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
         }
     }
 
+    func probePermission() -> PermissionState {
+        guard let app, app.isRunning else { return .unknown }
+        lastEventError = nil
+        _ = app.value(forKey: "soundVolume")
+        return lastEventError == nil ? .granted : .denied
+    }
+
     static func restoreIfNeeded(defaults: UserDefaults = .standard) {
         guard let volume = defaults.object(forKey: savedVolumeKey) as? Int else { return }
         defaults.removeObject(forKey: savedVolumeKey)
