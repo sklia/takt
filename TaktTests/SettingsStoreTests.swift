@@ -28,4 +28,14 @@ final class SettingsStoreTests: XCTestCase {
         store.narratorEnabled = true
         await fulfillment(of: [exp], timeout: 1)
     }
+
+    func test_hasShownWelcomeSheet_defaultsToFalse() {
+        XCTAssertFalse(SettingsStore(defaults: makeDefaults()).hasShownWelcomeSheet)
+    }
+
+    func test_hasShownWelcomeSheet_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hasShownWelcomeSheet = true
+        XCTAssertTrue(SettingsStore(defaults: defaults).hasShownWelcomeSheet)
+    }
 }

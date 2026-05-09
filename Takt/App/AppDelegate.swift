@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var engine: NarratorEngine?
     private var observer: PlaybackObserver?
     private var menuBar: MenuBarController?
+    private var firstRunSheet: FirstRunSheet?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = SettingsStore()
@@ -16,14 +17,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         let observer = PlaybackObserver()
         let menuBar = MenuBarController(settings: settings)
+        let firstRunSheet = FirstRunSheet(settings: settings)
 
         self.settings = settings
         self.engine = engine
         self.observer = observer
         self.menuBar = menuBar
+        self.firstRunSheet = firstRunSheet
 
         applyNarratorState()
         observeSettings()
+        firstRunSheet.presentIfNeeded()
     }
 
     private func applyNarratorState() {
