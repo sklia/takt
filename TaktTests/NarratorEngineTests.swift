@@ -130,6 +130,28 @@ final class NarratorEngineTests: XCTestCase {
         XCTAssertEqual(engine.permissionState, .denied)
     }
 
+    func test_deniedThenSuccessfulDuck_transitionsToGranted() async throws {
+        let log = CallLog()
+        let ducker = DuckerSpy(log: log)
+        ducker.duckError = TestError()
+        let engine = NarratorEngine(
+            speaker: SpeakerSpy(log: log),
+            ducker: ducker,
+            duckingLevel: 0.25,
+            debounce: Self.testDebounce
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "1", uri: "uri-a"))
+        await engine.pendingAnnouncement?.value
+        XCTAssertEqual(engine.permissionState, .denied)
+
+        ducker.duckError = nil
+
+        engine.handle(PlaybackEvent(artist: "B", title: "2", uri: "uri-b"))
+        await engine.pendingAnnouncement?.value
+        XCTAssertEqual(engine.permissionState, .granted)
+    }
+
     func test_eventDuringSpeak_cancelsAndRestoresThenAnnouncesNew() async throws {
         let log = CallLog()
         let speaker = SpeakerSpy(log: log, utteranceDuration: .milliseconds(80))
