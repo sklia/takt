@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/sklia/takt/compare/v0.4.1...v0.5.0) (2026-05-09)
+
+
+### Features
+
+* **settings:** modernize settings with tabbed layout and native Settings scene ([84a8b51](https://github.com/sklia/takt/commit/84a8b516f96d6a372ad43b1dc79c685ea9c9bf50))
+
+
+### Bug Fixes
+
+* **release:** declare Sparkle keys in project.yml ([2f62567](https://github.com/sklia/takt/commit/2f625673995c6239d18b8567f197029dc654b44b))
+
 ## [0.4.1](https://github.com/sklia/takt/compare/v0.4.0...v0.4.1) (2026-05-09)
 
 
