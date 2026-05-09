@@ -1,26 +1,49 @@
 import AppKit
+import Observation
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem?
+    private var settings: SettingsStore?
     private var engine: NarratorEngine?
     private var observer: PlaybackObserver?
+    private var menuBar: MenuBarController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "Takt")
-        statusItem = item
-
+        let settings = SettingsStore()
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
-            ducker: NoOpDucker()
+            ducker: SpotifyDucker()
         )
         let observer = PlaybackObserver()
-        observer.start { event in
-            engine.handle(event)
-        }
+        let menuBar = MenuBarController(settings: settings)
 
+        self.settings = settings
         self.engine = engine
         self.observer = observer
+        self.menuBar = menuBar
+
+        applyNarratorState()
+        observeSettings()
+    }
+
+    private func applyNarratorState() {
+        guard let settings, let engine, let observer else { return }
+        if settings.narratorEnabled {
+            observer.start { event in engine.handle(event) }
+        } else {
+            observer.stop()
+        }
+    }
+
+    private func observeSettings() {
+        withObservationTracking {
+            _ = settings?.narratorEnabled
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                self.applyNarratorState()
+                self.observeSettings()
+            }
+        }
     }
 }

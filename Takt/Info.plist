@@ -22,6 +22,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Takt lowers Spotify's volume during track announcements.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
 </dict>
