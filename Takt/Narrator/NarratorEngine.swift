@@ -6,10 +6,11 @@ enum PermissionState: Sendable, Equatable {
     case denied
 }
 
+@MainActor
 final class NarratorEngine {
-    typealias SpeechSettingsProvider = @Sendable () -> SpeechSettings
-    typealias DuckingLevelProvider = @Sendable () -> Float
-    typealias FocusSuppressedProvider = @Sendable () -> Bool
+    typealias SpeechSettingsProvider = () -> SpeechSettings
+    typealias DuckingLevelProvider = () -> Float
+    typealias FocusSuppressedProvider = () -> Bool
 
     private let speaker: any Speaker
     private let ducker: any Ducker
@@ -18,7 +19,7 @@ final class NarratorEngine {
     private let debounce: Duration
     private let speechTimeout: Duration
     private let speechSettings: SpeechSettingsProvider
-    private let permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)?
+    private let permissionStateChangeHandler: ((PermissionState) -> Void)?
     private var lastAnnouncedURI: String?
     private(set) var pendingAnnouncement: Task<Void, Never>?
 
@@ -35,7 +36,7 @@ final class NarratorEngine {
         debounce: Duration = .milliseconds(250),
         speechTimeout: Duration = .seconds(10),
         speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
-        permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)? = nil
+        permissionStateChangeHandler: ((PermissionState) -> Void)? = nil
     ) {
         self.speaker = speaker
         self.ducker = ducker

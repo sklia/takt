@@ -1,3 +1,4 @@
+import os
 import XCTest
 @testable import Takt
 
@@ -23,11 +24,9 @@ final class CallLog: @unchecked Sendable {
 final class SpeakerSpy: Speaker, @unchecked Sendable {
     let log: CallLog
     let utteranceDuration: Duration
-    private let lock = NSLock()
-    private var _spokenSettings: [SpeechSettings] = []
+    private let _spokenSettings = OSAllocatedUnfairLock(initialState: [SpeechSettings]())
     var spokenSettings: [SpeechSettings] {
-        lock.lock(); defer { lock.unlock() }
-        return _spokenSettings
+        _spokenSettings.withLock { $0 }
     }
     init(log: CallLog, utteranceDuration: Duration = .zero) {
         self.log = log
@@ -35,9 +34,7 @@ final class SpeakerSpy: Speaker, @unchecked Sendable {
     }
     func speak(_ phrase: String, settings: SpeechSettings) async {
         log.record(.speak(phrase))
-        lock.lock()
-        _spokenSettings.append(settings)
-        lock.unlock()
+        _spokenSettings.withLock { $0.append(settings) }
         if utteranceDuration > .zero {
             try? await Task.sleep(for: utteranceDuration)
         }
@@ -45,7 +42,7 @@ final class SpeakerSpy: Speaker, @unchecked Sendable {
     func cancel() { log.record(.cancel) }
 }
 
-final class DuckerSpy: Ducker, @unchecked Sendable {
+final class DuckerSpy: Ducker {
     let log: CallLog
     var duckError: Error?
     var restoreError: Error?
@@ -75,6 +72,7 @@ final class SpeechSettingsBox: @unchecked Sendable {
     }
 }
 
+@MainActor
 final class NarratorEngineTests: XCTestCase {
     private static let testDebounce: Duration = .milliseconds(20)
     private static let postFlushSlack: Duration = .milliseconds(60)

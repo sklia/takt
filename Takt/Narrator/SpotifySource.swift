@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class SpotifySource: MusicSource {
     static let notificationName = Notification.Name("com.spotify.client.PlaybackStateChanged")
 
@@ -10,11 +11,7 @@ final class SpotifySource: MusicSource {
         self.center = center
     }
 
-    deinit {
-        stop()
-    }
-
-    func start(handler: @escaping (PlaybackEvent) -> Void) {
+    func start(handler: @escaping @Sendable (PlaybackEvent) -> Void) {
         stop()
         token = center.addObserver(
             forName: Self.notificationName,

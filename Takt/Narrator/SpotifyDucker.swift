@@ -1,7 +1,8 @@
 import Foundation
 import ScriptingBridge
 
-final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationDelegate {
+@MainActor
+final class SpotifyDucker: NSObject, Ducker, SBApplicationDelegate {
     enum DuckerError: Error {
         case spotifyUnreachable
     }
@@ -10,7 +11,6 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
 
     private let bundleIdentifier = "com.spotify.client"
     private let defaults: UserDefaults
-    private let lock = NSLock()
     private var savedVolume: Int?
     private var lastEventError: Error?
 
@@ -36,9 +36,7 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
             throw DuckerError.spotifyUnreachable
         }
 
-        lock.lock()
         savedVolume = current
-        lock.unlock()
         defaults.set(current, forKey: Self.savedVolumeKey)
 
         lastEventError = nil
@@ -49,10 +47,8 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
     func restore() throws {
         let app = try connectedApp()
 
-        lock.lock()
         let saved = savedVolume
         savedVolume = nil
-        lock.unlock()
         defaults.removeObject(forKey: Self.savedVolumeKey)
 
         if let saved {
@@ -93,8 +89,10 @@ final class SpotifyDucker: NSObject, Ducker, @unchecked Sendable, SBApplicationD
     // Apple Event fails (e.g. errAEEventNotPermitted from TCC). Returning
     // NSNumber(0) is safe: ScriptingBridge unboxes via longLongValue, and we
     // detect the failure via lastEventError before using any returned value.
-    func eventDidFail(_ event: UnsafePointer<AppleEvent>, withError error: any Error) -> Any? {
-        lastEventError = error
+    nonisolated func eventDidFail(_ event: UnsafePointer<AppleEvent>, withError error: any Error) -> Any? {
+        MainActor.assumeIsolated {
+            lastEventError = error
+        }
         return NSNumber(value: 0)
     }
 }

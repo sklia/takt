@@ -1,8 +1,8 @@
-import AppIntents
+@preconcurrency import AppIntents
 
 struct TaktFocusFilter: SetFocusFilterIntent {
-    static var title: LocalizedStringResource = "Takt"
-    static var description: IntentDescription? = "Pause track narration during this Focus"
+    nonisolated(unsafe) static var title: LocalizedStringResource = "Takt"
+    nonisolated(unsafe) static var description: IntentDescription? = "Pause track narration during this Focus"
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "Takt", subtitle: "Pause track narration")

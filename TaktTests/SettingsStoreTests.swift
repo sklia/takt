@@ -2,6 +2,7 @@ import XCTest
 import Observation
 @testable import Takt
 
+@MainActor
 final class SettingsStoreTests: XCTestCase {
     private func makeDefaults() -> UserDefaults {
         UserDefaults(suiteName: "test-\(UUID().uuidString)")!

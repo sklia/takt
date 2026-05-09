@@ -45,7 +45,7 @@ extension VoiceInfo {
     }
 }
 
-struct VoiceCatalog {
+struct VoiceCatalog: Sendable {
     typealias Provider = @Sendable () -> [VoiceInfo]
 
     private let provider: Provider

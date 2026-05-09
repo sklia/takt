@@ -1,6 +1,7 @@
 import XCTest
 @testable import Takt
 
+@MainActor
 final class SpotifyEventParserTests: XCTestCase {
     private static let fullUserInfo: [AnyHashable: Any] = [
         "Name": "Get Lucky",

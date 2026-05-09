@@ -45,9 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             focusSuppressed: focusSuppressed,
             speechSettings: speechSettings,
             permissionStateChangeHandler: { [weak permissionStore] newState in
-                Task { @MainActor in
-                    permissionStore?.state = newState
-                }
+                permissionStore?.state = newState
             }
         )
         let updaterController = SPUStandardUpdaterController(
@@ -114,7 +112,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyNarratorState() {
         guard let settings, let engine, let observer else { return }
         if settings.narratorEnabled {
-            observer.start { event in engine.handle(event) }
+            observer.start { event in
+                MainActor.assumeIsolated { engine.handle(event) }
+            }
         } else {
             observer.stop()
         }
@@ -126,10 +126,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard let self, let ducker = self.ducker, let store = self.permissionStore else { return }
-            let probed = ducker.probePermission()
-            guard probed != .unknown else { return }
-            store.state = probed
+            MainActor.assumeIsolated {
+                guard let self, let ducker = self.ducker, let store = self.permissionStore else { return }
+                let probed = ducker.probePermission()
+                guard probed != .unknown else { return }
+                store.state = probed
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 final class SettingsStore {
     @ObservationIgnored private let defaults: UserDefaults
