@@ -10,6 +10,32 @@ struct SettingsView: View {
     let preview: (SpeechSettings) -> Void
 
     var body: some View {
+        TabView {
+            NarratorTab(
+                settings: settings,
+                permission: permission,
+                voiceCatalog: voiceCatalog,
+                preview: preview
+            )
+            .tabItem { Label("Narrator", systemImage: "waveform") }
+
+            GeneralTab(
+                settings: settings,
+                loginItem: loginItem
+            )
+            .tabItem { Label("General", systemImage: "gear") }
+        }
+        .frame(width: 450)
+    }
+}
+
+private struct NarratorTab: View {
+    @Bindable var settings: SettingsStore
+    @Bindable var permission: PermissionStateStore
+    let voiceCatalog: VoiceCatalog
+    let preview: (SpeechSettings) -> Void
+
+    var body: some View {
         Form {
             if permission.state == .denied {
                 Section {
@@ -50,6 +76,17 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+private struct GeneralTab: View {
+    @Bindable var settings: SettingsStore
+    @Bindable var loginItem: LoginItemController
+
+    var body: some View {
+        Form {
             Section("Hotkey") {
                 KeyboardShortcuts.Recorder("Toggle narrator", name: .toggleNarrator)
             }
@@ -61,7 +98,6 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 600)
     }
 }
 

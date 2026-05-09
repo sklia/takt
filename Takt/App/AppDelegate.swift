@@ -7,15 +7,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var permissionStore: PermissionStateStore?
     private(set) var settings: SettingsStore?
     private(set) var voiceCatalog: VoiceCatalog?
+    private(set) var loginItem: LoginItemController?
     private var engine: NarratorEngine?
     private var ducker: SpotifyDucker?
     private var observer: (any MusicSource)?
     private var menuBar: MenuBarController?
     private var firstRunSheet: FirstRunSheet?
     private var previewSpeaker: AVSpeechSpeaker?
-    private var settingsWindow: SettingsWindow?
     private var voiceQualityNudge: VoiceQualityNudge?
-    private var loginItem: LoginItemController?
     private var globalHotkey: GlobalHotkey?
     private var updaterController: SPUStandardUpdaterController?
 
@@ -61,22 +60,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             openSettings: { [weak self] in self?.showSettings() }
         )
         let firstRunSheet = FirstRunSheet(settings: settings)
-        let settingsWindow = SettingsWindow(
-            settings: settings,
-            permission: permissionStore,
-            loginItem: loginItem,
-            voiceCatalog: voiceCatalog,
-            preview: { [weak previewSpeaker] speech in
-                guard let previewSpeaker else { return }
-                Task {
-                    await previewSpeaker.speak("Daft Punk, Get Lucky", settings: speech)
-                }
-            }
-        )
         let voiceQualityNudge = VoiceQualityNudge(
             settings: settings,
             voiceCatalog: voiceCatalog,
-            openSettings: { [weak settingsWindow] in settingsWindow?.show() }
+            openSettings: { [weak self] in self?.showSettings() }
         )
         let globalHotkey = GlobalHotkey(toggle: { [weak settings, weak permissionStore] in
             guard let settings, let permissionStore else { return }
@@ -93,7 +80,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.menuBar = menuBar
         self.firstRunSheet = firstRunSheet
         self.previewSpeaker = previewSpeaker
-        self.settingsWindow = settingsWindow
         self.voiceQualityNudge = voiceQualityNudge
         self.loginItem = loginItem
         self.globalHotkey = globalHotkey
@@ -106,7 +92,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func showSettings() {
-        settingsWindow?.show()
+        NSApp.activate()
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+
+    func previewVoice(_ speech: SpeechSettings) {
+        guard let previewSpeaker else { return }
+        Task {
+            await previewSpeaker.speak("Daft Punk, Get Lucky", settings: speech)
+        }
     }
 
     private func applyNarratorState() {
