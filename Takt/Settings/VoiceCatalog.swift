@@ -69,4 +69,8 @@ struct VoiceCatalog {
     func defaultVoice(for locale: Locale) -> VoiceInfo? {
         voices(showAll: false, locale: locale).first?.voices.first
     }
+
+    func tier(for voiceID: String) -> VoiceTier {
+        provider().first(where: { $0.identifier == voiceID })?.tier ?? .standard
+    }
 }

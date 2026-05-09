@@ -9,6 +9,7 @@ final class SettingsStore {
     @ObservationIgnored private static let selectedVoiceIDKey = "selectedVoiceID"
     @ObservationIgnored private static let speechRateKey = "speechRate"
     @ObservationIgnored private static let showAllVoicesInPickerKey = "showAllVoicesInPicker"
+    @ObservationIgnored private static let hasShownVoiceQualityNudgeKey = "hasShownVoiceQualityNudge"
 
     static let defaultSpeechRate: Float = 0.52
 
@@ -38,6 +39,10 @@ final class SettingsStore {
         didSet { defaults.set(showAllVoicesInPicker, forKey: Self.showAllVoicesInPickerKey) }
     }
 
+    var hasShownVoiceQualityNudge: Bool {
+        didSet { defaults.set(hasShownVoiceQualityNudge, forKey: Self.hasShownVoiceQualityNudgeKey) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.narratorEnabled = defaults.bool(forKey: Self.narratorEnabledKey)
@@ -46,5 +51,6 @@ final class SettingsStore {
         let storedRate = defaults.object(forKey: Self.speechRateKey) as? Float
         self.speechRate = storedRate ?? Self.defaultSpeechRate
         self.showAllVoicesInPicker = defaults.bool(forKey: Self.showAllVoicesInPickerKey)
+        self.hasShownVoiceQualityNudge = defaults.bool(forKey: Self.hasShownVoiceQualityNudgeKey)
     }
 }

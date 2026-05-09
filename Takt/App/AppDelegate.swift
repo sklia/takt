@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var firstRunSheet: FirstRunSheet?
     private var previewSpeaker: AVSpeechSpeaker?
     private var settingsWindow: SettingsWindow?
+    private var voiceQualityNudge: VoiceQualityNudge?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = SettingsStore()
@@ -50,6 +51,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         )
+        let voiceQualityNudge = VoiceQualityNudge(
+            settings: settings,
+            voiceCatalog: voiceCatalog,
+            openSettings: { [weak settingsWindow] in settingsWindow?.show() }
+        )
 
         self.settings = settings
         self.permissionStore = permissionStore
@@ -60,6 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.firstRunSheet = firstRunSheet
         self.previewSpeaker = previewSpeaker
         self.settingsWindow = settingsWindow
+        self.voiceQualityNudge = voiceQualityNudge
 
         applyNarratorState()
         observeSettings()
