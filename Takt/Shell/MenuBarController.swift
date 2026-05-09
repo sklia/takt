@@ -8,10 +8,16 @@ final class MenuBarController {
     private let statusItem: NSStatusItem
     private let settings: SettingsStore
     private let permission: PermissionStateStore
+    private let openSettingsAction: () -> Void
 
-    init(settings: SettingsStore, permission: PermissionStateStore) {
+    init(
+        settings: SettingsStore,
+        permission: PermissionStateStore,
+        openSettings: @escaping () -> Void
+    ) {
         self.settings = settings
         self.permission = permission
+        self.openSettingsAction = openSettings
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         configureButton()
         applyIcon()
@@ -82,8 +88,7 @@ final class MenuBarController {
     }
 
     @objc private func openSettingsWindow() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate()
+        openSettingsAction()
     }
 
     @objc private func openAutomationSettings() {

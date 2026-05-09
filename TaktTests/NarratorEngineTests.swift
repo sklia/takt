@@ -23,12 +23,21 @@ final class CallLog: @unchecked Sendable {
 final class SpeakerSpy: Speaker, @unchecked Sendable {
     let log: CallLog
     let utteranceDuration: Duration
+    private let lock = NSLock()
+    private var _spokenSettings: [SpeechSettings] = []
+    var spokenSettings: [SpeechSettings] {
+        lock.lock(); defer { lock.unlock() }
+        return _spokenSettings
+    }
     init(log: CallLog, utteranceDuration: Duration = .zero) {
         self.log = log
         self.utteranceDuration = utteranceDuration
     }
-    func speak(_ phrase: String) async {
+    func speak(_ phrase: String, settings: SpeechSettings) async {
         log.record(.speak(phrase))
+        lock.lock()
+        _spokenSettings.append(settings)
+        lock.unlock()
         if utteranceDuration > .zero {
             try? await Task.sleep(for: utteranceDuration)
         }
@@ -52,6 +61,19 @@ final class DuckerSpy: Ducker, @unchecked Sendable {
 }
 
 struct TestError: Error, Equatable {}
+
+final class SpeechSettingsBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: SpeechSettings
+    init(_ initial: SpeechSettings) { stored = initial }
+    var current: SpeechSettings {
+        lock.lock(); defer { lock.unlock() }
+        return stored
+    }
+    func set(_ new: SpeechSettings) {
+        lock.lock(); stored = new; lock.unlock()
+    }
+}
 
 final class NarratorEngineTests: XCTestCase {
     private static let testDebounce: Duration = .milliseconds(20)
@@ -175,6 +197,32 @@ final class NarratorEngineTests: XCTestCase {
             .duck(0.25),
             .speak("B, 2"),
             .restore
+        ])
+    }
+
+    func test_speechSettings_runtimeUpdate_flowsToSpeaker() async throws {
+        let log = CallLog()
+        let speaker = SpeakerSpy(log: log)
+        let box = SpeechSettingsBox(SpeechSettings(voiceIdentifier: "voice-A", rate: 0.5))
+        let engine = NarratorEngine(
+            speaker: speaker,
+            ducker: DuckerSpy(log: log),
+            duckingLevel: 0.25,
+            debounce: Self.testDebounce,
+            speechSettings: { box.current }
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "1", uri: "uri-a"))
+        await engine.pendingAnnouncement?.value
+
+        box.set(SpeechSettings(voiceIdentifier: "voice-B", rate: 0.6))
+
+        engine.handle(PlaybackEvent(artist: "B", title: "2", uri: "uri-b"))
+        await engine.pendingAnnouncement?.value
+
+        XCTAssertEqual(speaker.spokenSettings, [
+            SpeechSettings(voiceIdentifier: "voice-A", rate: 0.5),
+            SpeechSettings(voiceIdentifier: "voice-B", rate: 0.6)
         ])
     }
 

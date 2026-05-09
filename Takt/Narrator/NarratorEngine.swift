@@ -7,10 +7,13 @@ enum PermissionState: Sendable, Equatable {
 }
 
 final class NarratorEngine {
+    typealias SpeechSettingsProvider = @Sendable () -> SpeechSettings
+
     private let speaker: any Speaker
     private let ducker: any Ducker
     private let duckingLevel: Float
     private let debounce: Duration
+    private let speechSettings: SpeechSettingsProvider
     private let permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)?
     private var lastAnnouncedURI: String?
     private(set) var pendingAnnouncement: Task<Void, Never>?
@@ -25,12 +28,14 @@ final class NarratorEngine {
         ducker: any Ducker,
         duckingLevel: Float = 0.25,
         debounce: Duration = .milliseconds(250),
+        speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
         permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)? = nil
     ) {
         self.speaker = speaker
         self.ducker = ducker
         self.duckingLevel = duckingLevel
         self.debounce = debounce
+        self.speechSettings = speechSettings
         self.permissionStateChangeHandler = permissionStateChangeHandler
     }
 
@@ -56,8 +61,10 @@ final class NarratorEngine {
             return
         }
         transition(to: .granted)
+        let phrase = "\(event.artist), \(event.title)"
+        let settings = speechSettings()
         await withTaskCancellationHandler {
-            await speaker.speak("\(event.artist), \(event.title)")
+            await speaker.speak(phrase, settings: settings)
         } onCancel: { [speaker] in
             speaker.cancel()
         }
