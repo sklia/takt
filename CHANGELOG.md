@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/sklia/takt/compare/v0.3.0...v0.3.1) (2026-05-09)
+
+
+### Bug Fixes
+
+* **release:** re-sign Sparkle binaries for notarization ([85b8ffc](https://github.com/sklia/takt/commit/85b8ffc85bea869cd44915f267e9600d94d25e9b))
+
 ## [0.3.0](https://github.com/sklia/takt/compare/v0.2.0...v0.3.0) (2026-05-09)
 
 
