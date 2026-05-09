@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import Sparkle
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -16,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var voiceQualityNudge: VoiceQualityNudge?
     private var loginItem: LoginItemController?
     private var globalHotkey: GlobalHotkey?
+    private var updaterController: SPUStandardUpdaterController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         SpotifyDucker.restoreIfNeeded()
@@ -48,10 +50,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         )
+        let updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
         let observer = SpotifySource()
         let menuBar = MenuBarController(
             settings: settings,
             permission: permissionStore,
+            updater: updaterController.updater,
             openSettings: { [weak self] in self?.showSettings() }
         )
         let firstRunSheet = FirstRunSheet(settings: settings)
@@ -91,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.voiceQualityNudge = voiceQualityNudge
         self.loginItem = loginItem
         self.globalHotkey = globalHotkey
+        self.updaterController = updaterController
 
         applyNarratorState()
         observeSettings()
