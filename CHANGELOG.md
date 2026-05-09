@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/sklia/takt/compare/v0.3.1...v0.4.0) (2026-05-09)
+
+
+### Features
+
+* Swift 6 strict concurrency migration ([00bb70a](https://github.com/sklia/takt/commit/00bb70a38bb63e984bc4c3e7f1183c5163d5312e))
+
 ## [0.3.1](https://github.com/sklia/takt/compare/v0.3.0...v0.3.1) (2026-05-09)
 
 
