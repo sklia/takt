@@ -18,6 +18,7 @@
     ".": {
       "release-type": "simple",
       "package-name": "takt",
+      "include-component-in-tag": false,
       "extra-files": [
         "project.yml"
       ]
