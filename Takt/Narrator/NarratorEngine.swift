@@ -14,6 +14,7 @@ final class NarratorEngine {
     private let ducker: any Ducker
     private let duckingLevelProvider: DuckingLevelProvider
     private let debounce: Duration
+    private let speechTimeout: Duration
     private let speechSettings: SpeechSettingsProvider
     private let permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)?
     private var lastAnnouncedURI: String?
@@ -29,6 +30,7 @@ final class NarratorEngine {
         ducker: any Ducker,
         duckingLevel: @escaping DuckingLevelProvider = { 0.25 },
         debounce: Duration = .milliseconds(250),
+        speechTimeout: Duration = .seconds(10),
         speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
         permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)? = nil
     ) {
@@ -36,6 +38,7 @@ final class NarratorEngine {
         self.ducker = ducker
         self.duckingLevelProvider = duckingLevel
         self.debounce = debounce
+        self.speechTimeout = speechTimeout
         self.speechSettings = speechSettings
         self.permissionStateChangeHandler = permissionStateChangeHandler
     }
@@ -65,7 +68,16 @@ final class NarratorEngine {
         let phrase = "\(event.artist), \(event.title)"
         let settings = speechSettings()
         await withTaskCancellationHandler {
-            await speaker.speak(phrase, settings: settings)
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask { [speaker] in
+                    await speaker.speak(phrase, settings: settings)
+                }
+                group.addTask { [speechTimeout] in
+                    try? await Task.sleep(for: speechTimeout)
+                }
+                await group.next()
+                group.cancelAll()
+            }
         } onCancel: { [speaker] in
             speaker.cancel()
         }

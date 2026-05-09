@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var globalHotkey: GlobalHotkey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        SpotifyDucker.restoreIfNeeded()
         let settings = SettingsStore()
         let permissionStore = PermissionStateStore()
         let voiceCatalog = VoiceCatalog()

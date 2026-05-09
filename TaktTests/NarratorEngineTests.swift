@@ -226,6 +226,25 @@ final class NarratorEngineTests: XCTestCase {
         ])
     }
 
+    func test_speechTimeout_restoresAfterDeadline() async throws {
+        let log = CallLog()
+        let speaker = SpeakerSpy(log: log, utteranceDuration: .milliseconds(200))
+        let engine = NarratorEngine(
+            speaker: speaker,
+            ducker: DuckerSpy(log: log),
+            duckingLevel: { 0.25 },
+            debounce: Self.testDebounce,
+            speechTimeout: .milliseconds(50)
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "1", uri: "uri-timeout"))
+        await engine.pendingAnnouncement?.value
+
+        let calls = log.snapshot()
+        XCTAssertEqual(calls.first, .duck(0.25))
+        XCTAssertEqual(calls.last, .restore)
+    }
+
     func test_twoEventsWithinDebounce_onlyLatestAnnounces() async throws {
         let log = CallLog()
         let engine = makeEngine(log: log)
