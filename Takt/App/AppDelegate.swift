@@ -3,6 +3,7 @@ import Observation
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private(set) var permissionStore: PermissionStateStore?
     private var settings: SettingsStore?
     private var engine: NarratorEngine?
     private var observer: PlaybackObserver?
@@ -11,15 +12,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = SettingsStore()
+        let permissionStore = PermissionStateStore()
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
-            ducker: SpotifyDucker()
+            ducker: SpotifyDucker(),
+            permissionStateChangeHandler: { [weak permissionStore] newState in
+                Task { @MainActor in
+                    permissionStore?.state = newState
+                }
+            }
         )
         let observer = PlaybackObserver()
-        let menuBar = MenuBarController(settings: settings)
+        let menuBar = MenuBarController(settings: settings, permission: permissionStore)
         let firstRunSheet = FirstRunSheet(settings: settings)
 
         self.settings = settings
+        self.permissionStore = permissionStore
         self.engine = engine
         self.observer = observer
         self.menuBar = menuBar

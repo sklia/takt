@@ -2,6 +2,7 @@ import os
 
 enum PermissionState: Sendable, Equatable {
     case unknown
+    case granted
     case denied
 }
 
@@ -10,6 +11,7 @@ final class NarratorEngine {
     private let ducker: any Ducker
     private let duckingLevel: Float
     private let debounce: Duration
+    private let permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)?
     private var lastAnnouncedURI: String?
     private(set) var pendingAnnouncement: Task<Void, Never>?
 
@@ -22,12 +24,14 @@ final class NarratorEngine {
         speaker: any Speaker,
         ducker: any Ducker,
         duckingLevel: Float = 0.25,
-        debounce: Duration = .milliseconds(250)
+        debounce: Duration = .milliseconds(250),
+        permissionStateChangeHandler: (@Sendable (PermissionState) -> Void)? = nil
     ) {
         self.speaker = speaker
         self.ducker = ducker
         self.duckingLevel = duckingLevel
         self.debounce = debounce
+        self.permissionStateChangeHandler = permissionStateChangeHandler
     }
 
     func handle(_ event: PlaybackEvent) {
@@ -48,9 +52,10 @@ final class NarratorEngine {
         do {
             try ducker.duck(to: duckingLevel)
         } catch {
-            markPermissionDenied()
+            transition(to: .denied)
             return
         }
+        transition(to: .granted)
         await withTaskCancellationHandler {
             await speaker.speak("\(event.artist), \(event.title)")
         } onCancel: { [speaker] in
@@ -59,7 +64,14 @@ final class NarratorEngine {
         try? ducker.restore()
     }
 
-    private func markPermissionDenied() {
-        permissionStateBox.withLock { $0 = .denied }
+    private func transition(to newState: PermissionState) {
+        let didChange = permissionStateBox.withLock { current -> Bool in
+            guard current != newState else { return false }
+            current = newState
+            return true
+        }
+        if didChange {
+            permissionStateChangeHandler?(newState)
+        }
     }
 }
