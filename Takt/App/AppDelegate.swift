@@ -31,11 +31,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let duckingLevelProvider: NarratorEngine.DuckingLevelProvider = { [weak settings] in
             settings?.duckingLevel ?? SettingsStore.defaultDuckingLevel
         }
+        let focusSuppressed: NarratorEngine.FocusSuppressedProvider = { [weak settings] in
+            guard settings?.pauseDuringFocus == true else { return false }
+            return UserDefaults.standard.bool(forKey: "focusPauseActive")
+        }
         let ducker = SpotifyDucker()
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
             ducker: ducker,
             duckingLevel: duckingLevelProvider,
+            focusSuppressed: focusSuppressed,
             speechSettings: speechSettings,
             permissionStateChangeHandler: { [weak permissionStore] newState in
                 Task { @MainActor in

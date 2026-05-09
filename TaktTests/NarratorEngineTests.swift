@@ -226,6 +226,22 @@ final class NarratorEngineTests: XCTestCase {
         ])
     }
 
+    func test_focusSuppressed_skipsAnnouncement() async throws {
+        let log = CallLog()
+        let engine = NarratorEngine(
+            speaker: SpeakerSpy(log: log),
+            ducker: DuckerSpy(log: log),
+            duckingLevel: { 0.25 },
+            focusSuppressed: { true },
+            debounce: Self.testDebounce
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "1", uri: "uri-focus"))
+        await engine.pendingAnnouncement?.value
+
+        XCTAssertEqual(log.snapshot(), [])
+    }
+
     func test_speechTimeout_restoresAfterDeadline() async throws {
         let log = CallLog()
         let speaker = SpeakerSpy(log: log, utteranceDuration: .milliseconds(200))

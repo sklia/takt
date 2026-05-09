@@ -11,6 +11,7 @@ final class SettingsStore {
     @ObservationIgnored private static let showAllVoicesInPickerKey = "showAllVoicesInPicker"
     @ObservationIgnored private static let hasShownVoiceQualityNudgeKey = "hasShownVoiceQualityNudge"
     @ObservationIgnored private static let duckingLevelKey = "duckingLevel"
+    @ObservationIgnored private static let pauseDuringFocusKey = "pauseDuringFocus"
 
     static let defaultSpeechRate: Float = 0.52
     static let defaultDuckingLevel: Float = 0.25
@@ -49,6 +50,10 @@ final class SettingsStore {
         didSet { defaults.set(duckingLevel, forKey: Self.duckingLevelKey) }
     }
 
+    var pauseDuringFocus: Bool {
+        didSet { defaults.set(pauseDuringFocus, forKey: Self.pauseDuringFocusKey) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.narratorEnabled = defaults.bool(forKey: Self.narratorEnabledKey)
@@ -60,5 +65,7 @@ final class SettingsStore {
         self.hasShownVoiceQualityNudge = defaults.bool(forKey: Self.hasShownVoiceQualityNudgeKey)
         let storedDuck = defaults.object(forKey: Self.duckingLevelKey) as? Float
         self.duckingLevel = storedDuck ?? Self.defaultDuckingLevel
+        let storedPause = defaults.object(forKey: Self.pauseDuringFocusKey) as? Bool
+        self.pauseDuringFocus = storedPause ?? true
     }
 }
