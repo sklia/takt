@@ -133,3 +133,76 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$TAG" "$RUNNER_TEMP/Takt.dmg" --clobber
+
+      - name: Sign DMG with Sparkle EdDSA
+        env:
+          SPARKLE_EDDSA_KEY: ${{ secrets.SPARKLE_EDDSA_KEY }}
+        run: |
+          set -euo pipefail
+          curl -sL "https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz" \
+            | tar -xJ -C "$RUNNER_TEMP" bin/sign_update
+
+          KEY_FILE="$RUNNER_TEMP/sparkle_key"
+          echo -n "$SPARKLE_EDDSA_KEY" > "$KEY_FILE"
+
+          SIGNATURE=$("$RUNNER_TEMP/bin/sign_update" "$RUNNER_TEMP/Takt.dmg" -f "$KEY_FILE" | grep -o 'edSignature="[^"]*"' | cut -d'"' -f2)
+          rm -f "$KEY_FILE"
+
+          echo "SPARKLE_ED_SIGNATURE=$SIGNATURE" >> "$GITHUB_ENV"
+
+      - name: Update appcast
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          DMG_SIZE=$(stat -f%z "$RUNNER_TEMP/Takt.dmg")
+          PUB_DATE=$(date -u +"%a, %d %b %Y %H:%M:%S %z")
+          DOWNLOAD_URL="https://github.com/sklia/takt/releases/download/${TAG}/Takt.dmg"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin gh-pages 2>/dev/null || true
+          if git rev-parse origin/gh-pages >/dev/null 2>&1; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          if [ ! -f appcast.xml ]; then
+          cat > appcast.xml << 'APPCAST'
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+            <channel>
+              <title>Takt</title>
+            </channel>
+          </rss>
+          APPCAST
+          fi
+
+          awk -v version="$VERSION" \
+              -v pubdate="$PUB_DATE" \
+              -v url="$DOWNLOAD_URL" \
+              -v sig="$SPARKLE_ED_SIGNATURE" \
+              -v size="$DMG_SIZE" \
+              '/<\/channel>/ {
+                print "    <item>"
+                print "      <title>Version " version "</title>"
+                print "      <pubDate>" pubdate "</pubDate>"
+                print "      <sparkle:version>" version "</sparkle:version>"
+                print "      <sparkle:shortVersionString>" version "</sparkle:shortVersionString>"
+                print "      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>"
+                print "      <enclosure url=\"" url "\""
+                print "                 sparkle:edSignature=\"" sig "\""
+                print "                 length=\"" size "\""
+                print "                 type=\"application/octet-stream\"/>"
+                print "    </item>"
+              }
+              { print }' appcast.xml > appcast_tmp.xml
+          mv appcast_tmp.xml appcast.xml
+
+          git add appcast.xml
+          git commit -m "appcast: ${TAG}"
+          git push origin gh-pages

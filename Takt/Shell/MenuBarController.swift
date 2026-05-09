@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import Sparkle
 
 @MainActor
 final class MenuBarController {
@@ -8,15 +9,18 @@ final class MenuBarController {
     private let statusItem: NSStatusItem
     private let settings: SettingsStore
     private let permission: PermissionStateStore
+    private let updater: SPUUpdater
     private let openSettingsAction: () -> Void
 
     init(
         settings: SettingsStore,
         permission: PermissionStateStore,
+        updater: SPUUpdater,
         openSettings: @escaping () -> Void
     ) {
         self.settings = settings
         self.permission = permission
+        self.updater = updater
         self.openSettingsAction = openSettings
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         configureButton()
@@ -65,6 +69,14 @@ final class MenuBarController {
         }
 
         menu.addItem(.separator())
+        let updateItem = NSMenuItem(
+            title: "Check for Updates…",
+            action: #selector(checkForUpdates),
+            keyEquivalent: ""
+        )
+        updateItem.target = self
+        menu.addItem(updateItem)
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(
             title: "Quit Takt",
             action: #selector(NSApplication.terminate(_:)),
@@ -82,6 +94,10 @@ final class MenuBarController {
 
     @objc private func openSettingsWindow() {
         openSettingsAction()
+    }
+
+    @objc private func checkForUpdates() {
+        updater.checkForUpdates()
     }
 
     @objc private func openAutomationSettings() {
