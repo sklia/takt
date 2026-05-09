@@ -5,6 +5,7 @@ import SwiftUI
 final class SettingsWindow {
     private let settings: SettingsStore
     private let permission: PermissionStateStore
+    private let loginItem: LoginItemController
     private let voiceCatalog: VoiceCatalog
     private let preview: (SpeechSettings) -> Void
     private var window: NSWindow?
@@ -12,11 +13,13 @@ final class SettingsWindow {
     init(
         settings: SettingsStore,
         permission: PermissionStateStore,
+        loginItem: LoginItemController,
         voiceCatalog: VoiceCatalog,
         preview: @escaping (SpeechSettings) -> Void
     ) {
         self.settings = settings
         self.permission = permission
+        self.loginItem = loginItem
         self.voiceCatalog = voiceCatalog
         self.preview = preview
     }
@@ -30,6 +33,7 @@ final class SettingsWindow {
         let view = SettingsView(
             settings: settings,
             permission: permission,
+            loginItem: loginItem,
             voiceCatalog: voiceCatalog,
             preview: preview
         )

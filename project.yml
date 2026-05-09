@@ -19,12 +19,19 @@ settings:
     MARKETING_VERSION: "0.1.0" # x-release-please-version
     CURRENT_PROJECT_VERSION: "1"
 
+packages:
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.2.0
+
 targets:
   Takt:
     type: application
     platform: macOS
     sources:
       - path: Takt
+    dependencies:
+      - package: KeyboardShortcuts
     info:
       path: Takt/Info.plist
       properties:

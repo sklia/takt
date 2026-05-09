@@ -1,9 +1,11 @@
 import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settings: SettingsStore
     @Bindable var permission: PermissionStateStore
+    @Bindable var loginItem: LoginItemController
     let voiceCatalog: VoiceCatalog
     let preview: (SpeechSettings) -> Void
 
@@ -36,9 +38,27 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            Section("Spotify volume while narrator speaks") {
+                HStack {
+                    Text("0%")
+                        .foregroundStyle(.secondary)
+                    Slider(value: $settings.duckingLevel, in: 0...1)
+                    Text("100%")
+                        .foregroundStyle(.secondary)
+                }
+                Text("Currently \(Int((settings.duckingLevel * 100).rounded()))%")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Hotkey") {
+                KeyboardShortcuts.Recorder("Toggle narrator", name: .toggleNarrator)
+            }
+            Section("Startup") {
+                Toggle("Start Takt automatically when you log in", isOn: $loginItem.isEnabled)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 420)
+        .frame(width: 480, height: 600)
     }
 }
 

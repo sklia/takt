@@ -89,4 +89,14 @@ final class SettingsStoreTests: XCTestCase {
         SettingsStore(defaults: defaults).hasShownVoiceQualityNudge = true
         XCTAssertTrue(SettingsStore(defaults: defaults).hasShownVoiceQualityNudge)
     }
+
+    func test_duckingLevel_defaultsTo025() {
+        XCTAssertEqual(SettingsStore(defaults: makeDefaults()).duckingLevel, 0.25)
+    }
+
+    func test_duckingLevel_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).duckingLevel = 0.6
+        XCTAssertEqual(SettingsStore(defaults: defaults).duckingLevel, 0.6)
+    }
 }
