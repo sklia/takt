@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/sklia/takt/compare/v0.4.0...v0.4.1) (2026-05-09)
+
+
+### Bug Fixes
+
+* **release:** discard build artifacts before switching to gh-pages ([c04ba5b](https://github.com/sklia/takt/commit/c04ba5bbeec780e9bfae044cf5bdcef529b1b10a))
+
 ## [0.4.0](https://github.com/sklia/takt/compare/v0.3.1...v0.4.0) (2026-05-09)
 
 
