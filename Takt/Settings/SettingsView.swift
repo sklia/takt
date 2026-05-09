@@ -53,6 +53,9 @@ struct SettingsView: View {
             Section("Hotkey") {
                 KeyboardShortcuts.Recorder("Toggle narrator", name: .toggleNarrator)
             }
+            Section("Focus") {
+                Toggle("Pause narration during Focus modes", isOn: $settings.pauseDuringFocus)
+            }
             Section("Startup") {
                 Toggle("Start Takt automatically when you log in", isOn: $loginItem.isEnabled)
             }

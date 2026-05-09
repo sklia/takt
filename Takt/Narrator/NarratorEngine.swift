@@ -9,10 +9,12 @@ enum PermissionState: Sendable, Equatable {
 final class NarratorEngine {
     typealias SpeechSettingsProvider = @Sendable () -> SpeechSettings
     typealias DuckingLevelProvider = @Sendable () -> Float
+    typealias FocusSuppressedProvider = @Sendable () -> Bool
 
     private let speaker: any Speaker
     private let ducker: any Ducker
     private let duckingLevelProvider: DuckingLevelProvider
+    private let focusSuppressed: FocusSuppressedProvider
     private let debounce: Duration
     private let speechTimeout: Duration
     private let speechSettings: SpeechSettingsProvider
@@ -29,6 +31,7 @@ final class NarratorEngine {
         speaker: any Speaker,
         ducker: any Ducker,
         duckingLevel: @escaping DuckingLevelProvider = { 0.25 },
+        focusSuppressed: @escaping FocusSuppressedProvider = { false },
         debounce: Duration = .milliseconds(250),
         speechTimeout: Duration = .seconds(10),
         speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
@@ -37,6 +40,7 @@ final class NarratorEngine {
         self.speaker = speaker
         self.ducker = ducker
         self.duckingLevelProvider = duckingLevel
+        self.focusSuppressed = focusSuppressed
         self.debounce = debounce
         self.speechTimeout = speechTimeout
         self.speechSettings = speechSettings
@@ -58,6 +62,7 @@ final class NarratorEngine {
         } catch {
             return
         }
+        if focusSuppressed() { return }
         do {
             try ducker.duck(to: duckingLevelProvider())
         } catch {
