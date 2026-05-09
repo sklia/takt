@@ -79,6 +79,20 @@ jobs:
           mkdir -p "$RUNNER_TEMP/staged"
           cp -R "$RUNNER_TEMP/Takt.xcarchive/Products/Applications/Takt.app" "$RUNNER_TEMP/staged/"
 
+      - name: Re-sign Sparkle binaries
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/staged/Takt.app"
+          SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+          SIGN=(codesign --force --options runtime --timestamp --sign "Developer ID Application")
+
+          "${SIGN[@]}" "$SPARKLE/Versions/B/XPCServices/Downloader.xpc"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/Updater.app"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/Autoupdate"
+          "${SIGN[@]}" "$SPARKLE"
+          "${SIGN[@]}" "$APP"
+
       - name: Notarize and staple app
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -89,11 +103,25 @@ jobs:
           ZIP_PATH="$RUNNER_TEMP/Takt-app.zip"
           ditto -c -k --keepParent "$RUNNER_TEMP/staged/Takt.app" "$ZIP_PATH"
 
-          xcrun notarytool submit "$ZIP_PATH" \
+          RESULT=$(xcrun notarytool submit "$ZIP_PATH" \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_APP_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait
+            --wait \
+            --output-format json)
+
+          echo "$RESULT"
+          STATUS=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          ID=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "::error::Notarization failed with status: $STATUS"
+            xcrun notarytool log "$ID" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_APP_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID" || true
+            exit 1
+          fi
 
           xcrun stapler staple "$RUNNER_TEMP/staged/Takt.app"
           xcrun stapler validate "$RUNNER_TEMP/staged/Takt.app"
