@@ -66,6 +66,20 @@ struct GeneralTab: View {
 
     var body: some View {
         Form {
+            Section("Display") {
+                Toggle("Show track overlay on song change", isOn: $settings.showHUD)
+                Picker("Style", selection: $settings.hudStyle) {
+                    ForEach(HUDStyle.allCases, id: \.self) { style in
+                        Text(style.label).tag(style)
+                    }
+                }
+                Picker("Position", selection: $settings.hudPosition) {
+                    ForEach(HUDPosition.allCases, id: \.self) { position in
+                        Text(position.label).tag(position)
+                    }
+                }
+                Toggle("Follow focused screen", isOn: $settings.hudFollowsFocusedScreen)
+            }
             Section("Hotkey") {
                 KeyboardShortcuts.Recorder("Toggle narrator", name: .toggleNarrator)
             }
@@ -124,7 +138,9 @@ private struct VoicePicker: View {
 }
 
 private struct PermissionBanner: View {
-    private static let automationSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")
+    private static let automationSettingsURL = URL(
+        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"
+    )
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

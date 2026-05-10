@@ -2,7 +2,7 @@ name: Takt
 options:
   bundleIdPrefix: app.sklia
   deploymentTarget:
-    macOS: "14.0"
+    macOS: "26.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
 
@@ -15,8 +15,8 @@ settings:
     CODE_SIGNING_REQUIRED: YES
     DEVELOPMENT_TEAM: ""
     ENABLE_HARDENED_RUNTIME: YES
-    MACOSX_DEPLOYMENT_TARGET: "14.0"
-    MARKETING_VERSION: "0.6.0" # x-release-please-version
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    MARKETING_VERSION: "0.5.1" # x-release-please-version
     CURRENT_PROJECT_VERSION: "$(MARKETING_VERSION)"
 
 packages:

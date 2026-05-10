@@ -43,11 +43,21 @@ final class VoiceCatalogTests: XCTestCase {
     // MARK: voices grouping
 
     private static let stub: [VoiceInfo] = [
-        VoiceInfo(identifier: "com.apple.voice.compact.en-US.Samantha", name: "Samantha", language: "en-US", tier: .standard),
-        VoiceInfo(identifier: "com.apple.voice.premium.en-US.Ava", name: "Ava", language: "en-US", tier: .premium),
-        VoiceInfo(identifier: "com.apple.voice.tts.en-US.helena", name: "Helena", language: "en-US", tier: .siri),
-        VoiceInfo(identifier: "com.apple.speech.synthesis.voice.Albert", name: "Albert", language: "en-US", tier: .novelty),
-        VoiceInfo(identifier: "com.apple.voice.premium.fr-FR.Amelie", name: "Amelie", language: "fr-FR", tier: .premium)
+        VoiceInfo(
+            identifier: "com.apple.voice.compact.en-US.Samantha", name: "Samantha", language: "en-US", tier: .standard
+        ),
+        VoiceInfo(
+            identifier: "com.apple.voice.premium.en-US.Ava", name: "Ava", language: "en-US", tier: .premium
+        ),
+        VoiceInfo(
+            identifier: "com.apple.voice.tts.en-US.helena", name: "Helena", language: "en-US", tier: .siri
+        ),
+        VoiceInfo(
+            identifier: "com.apple.speech.synthesis.voice.Albert", name: "Albert", language: "en-US", tier: .novelty
+        ),
+        VoiceInfo(
+            identifier: "com.apple.voice.premium.fr-FR.Amelie", name: "Amelie", language: "fr-FR", tier: .premium
+        )
     ]
 
     func test_voices_excludesNoveltyByDefault() {

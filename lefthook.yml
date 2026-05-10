@@ -1,0 +1,16 @@
+pre-commit:
+  commands:
+    swiftlint:
+      glob: "*.swift"
+      run: swiftlint lint --strict {staged_files}
+
+pre-push:
+  commands:
+    test:
+      run: >
+        xcodebuild test
+        -scheme Takt
+        -destination 'platform=macOS'
+        CODE_SIGN_IDENTITY="-"
+        CODE_SIGNING_REQUIRED=NO
+        -quiet
