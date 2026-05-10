@@ -4,26 +4,25 @@ import Sparkle
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private(set) var permissionStore: PermissionStateStore?
-    private(set) var settings: SettingsStore?
-    private(set) var voiceCatalog: VoiceCatalog?
-    private(set) var loginItem: LoginItemController?
+    private(set) var permissionStore = PermissionStateStore()
+    private(set) var settings = SettingsStore()
+    private(set) var voiceCatalog = VoiceCatalog()
+    private(set) var loginItem = LoginItemController()
     private var engine: NarratorEngine?
     private var ducker: SpotifyDucker?
     private var observer: (any MusicSource)?
     private var menuBar: MenuBarController?
     private var firstRunSheet: FirstRunSheet?
     private var previewSpeaker: AVSpeechSpeaker?
+    private var settingsWindow: SettingsWindow?
     private var voiceQualityNudge: VoiceQualityNudge?
     private var globalHotkey: GlobalHotkey?
     private var updaterController: SPUStandardUpdaterController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         SpotifyDucker.restoreIfNeeded()
-        let settings = SettingsStore()
-        let permissionStore = PermissionStateStore()
-        let voiceCatalog = VoiceCatalog()
-        let loginItem = LoginItemController()
+        let settings = self.settings
+        let permissionStore = self.permissionStore
         let previewSpeaker = AVSpeechSpeaker()
         let speechSettings: NarratorEngine.SpeechSettingsProvider = { [weak settings] in
             guard let settings else { return SpeechSettings(voiceIdentifier: nil, rate: 0.5) }
@@ -60,6 +59,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             openSettings: { [weak self] in self?.showSettings() }
         )
         let firstRunSheet = FirstRunSheet(settings: settings)
+        let settingsWindow = SettingsWindow(
+            settings: settings,
+            permission: permissionStore,
+            loginItem: loginItem,
+            voiceCatalog: voiceCatalog,
+            preview: { [weak previewSpeaker] speech in
+                guard let previewSpeaker else { return }
+                Task {
+                    await previewSpeaker.speak("Daft Punk, Get Lucky", settings: speech)
+                }
+            }
+        )
         let voiceQualityNudge = VoiceQualityNudge(
             settings: settings,
             voiceCatalog: voiceCatalog,
@@ -71,17 +82,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             settings.narratorEnabled.toggle()
         })
 
-        self.settings = settings
-        self.permissionStore = permissionStore
-        self.voiceCatalog = voiceCatalog
         self.engine = engine
         self.ducker = ducker
         self.observer = observer
         self.menuBar = menuBar
         self.firstRunSheet = firstRunSheet
         self.previewSpeaker = previewSpeaker
+        self.settingsWindow = settingsWindow
         self.voiceQualityNudge = voiceQualityNudge
-        self.loginItem = loginItem
         self.globalHotkey = globalHotkey
         self.updaterController = updaterController
 
@@ -92,19 +100,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func showSettings() {
-        NSApp.activate()
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-    }
-
-    func previewVoice(_ speech: SpeechSettings) {
-        guard let previewSpeaker else { return }
-        Task {
-            await previewSpeaker.speak("Daft Punk, Get Lucky", settings: speech)
-        }
+        settingsWindow?.show()
     }
 
     private func applyNarratorState() {
-        guard let settings, let engine, let observer else { return }
+        guard let engine, let observer else { return }
         if settings.narratorEnabled {
             observer.start { event in
                 MainActor.assumeIsolated { engine.handle(event) }
@@ -121,17 +121,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, let ducker = self.ducker, let store = self.permissionStore else { return }
+                guard let self, let ducker = self.ducker else { return }
                 let probed = ducker.probePermission()
                 guard probed != .unknown else { return }
-                store.state = probed
+                self.permissionStore.state = probed
             }
         }
     }
 
     private func observeSettings() {
         withObservationTracking {
-            _ = settings?.narratorEnabled
+            _ = settings.narratorEnabled
         } onChange: { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
