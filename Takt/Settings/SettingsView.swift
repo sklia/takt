@@ -15,6 +15,11 @@ struct NarratorTab: View {
                     PermissionBanner()
                 }
             }
+            Section("Announcement") {
+                Toggle("Artist", isOn: $settings.announceArtist)
+                Toggle("Title", isOn: $settings.announceTitle)
+                Toggle("Album", isOn: $settings.announceAlbum)
+            }
             Section("Voice") {
                 VoicePicker(settings: settings, voiceCatalog: voiceCatalog)
                 Toggle("Show all voices", isOn: $settings.showAllVoicesInPicker)

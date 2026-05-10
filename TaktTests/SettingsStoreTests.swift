@@ -100,4 +100,34 @@ final class SettingsStoreTests: XCTestCase {
         SettingsStore(defaults: defaults).duckingLevel = 0.6
         XCTAssertEqual(SettingsStore(defaults: defaults).duckingLevel, 0.6)
     }
+
+    func test_announceArtist_defaultsToTrue() {
+        XCTAssertTrue(SettingsStore(defaults: makeDefaults()).announceArtist)
+    }
+
+    func test_announceArtist_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).announceArtist = false
+        XCTAssertFalse(SettingsStore(defaults: defaults).announceArtist)
+    }
+
+    func test_announceTitle_defaultsToTrue() {
+        XCTAssertTrue(SettingsStore(defaults: makeDefaults()).announceTitle)
+    }
+
+    func test_announceTitle_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).announceTitle = false
+        XCTAssertFalse(SettingsStore(defaults: defaults).announceTitle)
+    }
+
+    func test_announceAlbum_defaultsToFalse() {
+        XCTAssertFalse(SettingsStore(defaults: makeDefaults()).announceAlbum)
+    }
+
+    func test_announceAlbum_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).announceAlbum = true
+        XCTAssertTrue(SettingsStore(defaults: defaults).announceAlbum)
+    }
 }

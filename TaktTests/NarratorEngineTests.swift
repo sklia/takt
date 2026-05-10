@@ -259,6 +259,70 @@ final class NarratorEngineTests: XCTestCase {
         XCTAssertEqual(calls.last, .restore)
     }
 
+    func test_phraseComposer_customPhrase_flowsToSpeaker() async throws {
+        let log = CallLog()
+        let engine = NarratorEngine(
+            speaker: SpeakerSpy(log: log),
+            ducker: DuckerSpy(log: log),
+            duckingLevel: { 0.25 },
+            debounce: Self.testDebounce,
+            phraseComposer: { "\($0.title) by \($0.artist)" }
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "Song", uri: "uri-composer"))
+        await engine.pendingAnnouncement?.value
+
+        XCTAssertEqual(log.snapshot(), [
+            .duck(0.25),
+            .speak("Song by A"),
+            .restore
+        ])
+    }
+
+    func test_phraseComposer_returnsNil_skipsSpeech() async throws {
+        let log = CallLog()
+        let engine = NarratorEngine(
+            speaker: SpeakerSpy(log: log),
+            ducker: DuckerSpy(log: log),
+            duckingLevel: { 0.25 },
+            debounce: Self.testDebounce,
+            phraseComposer: { _ in nil }
+        )
+
+        engine.handle(PlaybackEvent(artist: "A", title: "1", uri: "uri-nil"))
+        await engine.pendingAnnouncement?.value
+
+        XCTAssertEqual(log.snapshot(), [
+            .duck(0.25),
+            .restore
+        ])
+    }
+
+    func test_phraseComposer_albumIncluded() async throws {
+        let log = CallLog()
+        let engine = NarratorEngine(
+            speaker: SpeakerSpy(log: log),
+            ducker: DuckerSpy(log: log),
+            duckingLevel: { 0.25 },
+            debounce: Self.testDebounce,
+            phraseComposer: { event in
+                [event.artist, event.title, event.album].compactMap { $0 }.joined(separator: ", ")
+            }
+        )
+
+        engine.handle(PlaybackEvent(
+            artist: "Daft Punk", title: "Get Lucky",
+            album: "Random Access Memories", uri: "uri-album"
+        ))
+        await engine.pendingAnnouncement?.value
+
+        XCTAssertEqual(log.snapshot(), [
+            .duck(0.25),
+            .speak("Daft Punk, Get Lucky, Random Access Memories"),
+            .restore
+        ])
+    }
+
     func test_twoEventsWithinDebounce_onlyLatestAnnounces() async throws {
         let log = CallLog()
         let engine = makeEngine(log: log)

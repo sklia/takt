@@ -4,6 +4,7 @@ enum SpotifyEventParser {
               let artist = userInfo["Artist"] as? String,
               let uri = userInfo["Track ID"] as? String
         else { return nil }
-        return PlaybackEvent(artist: artist, title: title, uri: uri)
+        let album = userInfo["Album"] as? String
+        return PlaybackEvent(artist: artist, title: title, album: album, uri: uri)
     }
 }
