@@ -8,8 +8,8 @@ final class SpotifyDucker: NSObject, Ducker, SBApplicationDelegate {
     }
 
     private static let savedVolumeKey = "ducking.savedVolume"
+    private static let spotifyBundleID = "com.spotify.client"
 
-    private let bundleIdentifier = "com.spotify.client"
     private let defaults: UserDefaults
     private var savedVolume: Int?
     private var lastEventError: Error?
@@ -20,7 +20,7 @@ final class SpotifyDucker: NSObject, Ducker, SBApplicationDelegate {
     }
 
     private lazy var app: SBApplication? = {
-        let app = SBApplication(bundleIdentifier: bundleIdentifier)
+        let app = SBApplication(bundleIdentifier: Self.spotifyBundleID)
         app?.delegate = self
         return app
     }()
@@ -80,7 +80,7 @@ final class SpotifyDucker: NSObject, Ducker, SBApplicationDelegate {
     static func restoreIfNeeded(defaults: UserDefaults = .standard) {
         guard let volume = defaults.object(forKey: savedVolumeKey) as? Int else { return }
         defaults.removeObject(forKey: savedVolumeKey)
-        guard let app = SBApplication(bundleIdentifier: "com.spotify.client"),
+        guard let app = SBApplication(bundleIdentifier: spotifyBundleID),
               app.isRunning else { return }
         app.setValue(volume, forKey: "soundVolume")
     }

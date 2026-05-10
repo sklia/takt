@@ -4,10 +4,6 @@ import Sparkle
 
 @MainActor
 final class MenuBarController {
-    private static let automationSettingsURL = URL(
-        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"
-    )
-
     private let statusItem: NSStatusItem
     private let settings: SettingsStore
     private let permission: PermissionStateStore
@@ -103,7 +99,7 @@ final class MenuBarController {
     }
 
     @objc private func openAutomationSettings() {
-        if let url = Self.automationSettingsURL {
+        if let url = SystemSettingsURL.automation {
             NSWorkspace.shared.open(url)
         }
     }

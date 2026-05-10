@@ -34,6 +34,7 @@ final class HUDPanel: NSPanel {
 
     func installTrackingArea() {
         guard let contentView else { return }
+        contentView.trackingAreas.forEach { contentView.removeTrackingArea($0) }
         let area = NSTrackingArea(
             rect: contentView.bounds,
             options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],

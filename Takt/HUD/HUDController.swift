@@ -115,8 +115,8 @@ final class HUDController {
 
     private func scheduleDismiss() {
         dismissTask?.cancel()
-        dismissTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(self?.dismissDelay ?? 4))
+        dismissTask = Task { [weak self, dismissDelay] in
+            try? await Task.sleep(for: .seconds(dismissDelay))
             guard !Task.isCancelled else { return }
             self?.dismiss()
         }

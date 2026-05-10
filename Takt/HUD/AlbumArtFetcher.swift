@@ -1,7 +1,11 @@
 import AppKit
 
 actor AlbumArtFetcher {
-    private var cache: [String: NSImage] = [:]
+    private let cache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        cache.countLimit = 50
+        return cache
+    }()
     private let session: URLSession
 
     init(session: URLSession = .shared) {
@@ -9,12 +13,13 @@ actor AlbumArtFetcher {
     }
 
     func fetch(uri: String) async -> NSImage? {
-        if let cached = cache[uri] { return cached }
+        let key = uri as NSString
+        if let cached = cache.object(forKey: key) { return cached }
         guard let thumbnailURL = await fetchThumbnailURL(uri: uri) else { return nil }
         guard let (data, _) = try? await session.data(from: thumbnailURL),
               let image = NSImage(data: data)
         else { return nil }
-        cache[uri] = image
+        cache.setObject(image, forKey: key)
         return image
     }
 

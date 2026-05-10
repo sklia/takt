@@ -138,10 +138,6 @@ private struct VoicePicker: View {
 }
 
 private struct PermissionBanner: View {
-    private static let automationSettingsURL = URL(
-        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"
-    )
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Spotify automation permission denied", systemImage: "exclamationmark.triangle.fill")
@@ -151,14 +147,12 @@ private struct PermissionBanner: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Button("Open System Settings", action: openAutomationSettings)
+            Button("Open System Settings") {
+                if let url = SystemSettingsURL.automation {
+                    NSWorkspace.shared.open(url)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func openAutomationSettings() {
-        if let url = Self.automationSettingsURL {
-            NSWorkspace.shared.open(url)
-        }
     }
 }
