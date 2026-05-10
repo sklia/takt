@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.1](https://github.com/sklia/takt/compare/v0.7.0...v0.7.1) (2026-05-10)
+
+
+### Bug Fixes
+
+* improve code quality and fix HUD tracking area bug ([b94832c](https://github.com/sklia/takt/commit/b94832c2e32b0ed6c4d0b95d4d84af20c366e3cb))
+
+
+### CI
+
+* use macos26 in release workflow ([c5c6e69](https://github.com/sklia/takt/commit/c5c6e69d59909445adfd37fa29fb098eca517d67))
+
 ## [0.7.0](https://github.com/sklia/takt/compare/v0.6.0...v0.7.0) (2026-05-10)
 
 
