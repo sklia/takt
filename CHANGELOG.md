@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/sklia/takt/compare/v0.6.0...v0.7.0) (2026-05-10)
+
+
+### Features
+
+* **hud:** track overlay with album art and Liquid Glass ([#50](https://github.com/sklia/takt/issues/50)) ([cc37841](https://github.com/sklia/takt/commit/cc37841f57410e00e0d4265eabe71df907af9836))
+
+
+### CI
+
+* **deps:** bump actions/checkout from 4 to 6 in the actions group ([#52](https://github.com/sklia/takt/issues/52)) ([8f5c25f](https://github.com/sklia/takt/commit/8f5c25f79bce3459d5dad6b250c56d60e3499018))
+
 ## [0.6.0](https://github.com/sklia/takt/compare/v0.5.1...v0.6.0) (2026-05-10)
 
 
