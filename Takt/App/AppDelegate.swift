@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var previewSpeaker: AVSpeechSpeaker?
     private var settingsWindow: SettingsWindow?
     private var voiceQualityNudge: VoiceQualityNudge?
+    private var hudController: HUDController?
     private var globalHotkey: GlobalHotkey?
     private var updaterController: SPUStandardUpdaterController?
 
@@ -90,6 +91,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             voiceCatalog: voiceCatalog,
             openSettings: { [weak self] in self?.showSettings() }
         )
+        let hudController = HUDController(
+            style: { [weak settings] in settings?.hudStyle ?? .standard },
+            position: { [weak settings] in settings?.hudPosition ?? .topCenter },
+            screen: { [weak settings] in
+                guard settings?.hudFollowsFocusedScreen == true else {
+                    return NSScreen.screens.first
+                }
+                return NSScreen.main
+            }
+        )
         let globalHotkey = GlobalHotkey(toggle: { [weak settings, weak permissionStore] in
             guard let settings, let permissionStore else { return }
             guard permissionStore.state != .denied else { return }
@@ -104,10 +115,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.previewSpeaker = previewSpeaker
         self.settingsWindow = settingsWindow
         self.voiceQualityNudge = voiceQualityNudge
+        self.hudController = hudController
         self.globalHotkey = globalHotkey
         self.updaterController = updaterController
 
-        applyNarratorState()
+        applyObserverState()
         observeSettings()
         observePermission()
         firstRunSheet.presentIfNeeded()
@@ -117,11 +129,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsWindow?.show()
     }
 
-    private func applyNarratorState() {
-        guard let engine, let observer else { return }
-        if settings.narratorEnabled {
+    private func applyObserverState() {
+        guard let engine, let observer, let hudController else { return }
+        let needsObserver = settings.narratorEnabled || settings.showHUD
+        if needsObserver {
+            let narratorOn = settings.narratorEnabled
+            let hudOn = settings.showHUD
             observer.start { event in
-                MainActor.assumeIsolated { engine.handle(event) }
+                MainActor.assumeIsolated {
+                    if narratorOn { engine.handle(event) }
+                    if hudOn { hudController.show(event) }
+                }
             }
         } else {
             observer.stop()
@@ -146,10 +164,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func observeSettings() {
         withObservationTracking {
             _ = settings.narratorEnabled
+            _ = settings.showHUD
         } onChange: { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
-                self.applyNarratorState()
+                self.applyObserverState()
                 self.observeSettings()
             }
         }

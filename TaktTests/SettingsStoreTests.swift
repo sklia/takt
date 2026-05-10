@@ -130,4 +130,34 @@ final class SettingsStoreTests: XCTestCase {
         SettingsStore(defaults: defaults).announceAlbum = true
         XCTAssertTrue(SettingsStore(defaults: defaults).announceAlbum)
     }
+
+    func test_hudStyle_defaultsToStandard() {
+        XCTAssertEqual(SettingsStore(defaults: makeDefaults()).hudStyle, .standard)
+    }
+
+    func test_hudStyle_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hudStyle = .compact
+        XCTAssertEqual(SettingsStore(defaults: defaults).hudStyle, .compact)
+    }
+
+    func test_hudPosition_defaultsToTopCenter() {
+        XCTAssertEqual(SettingsStore(defaults: makeDefaults()).hudPosition, .topCenter)
+    }
+
+    func test_hudPosition_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hudPosition = .bottomLeft
+        XCTAssertEqual(SettingsStore(defaults: defaults).hudPosition, .bottomLeft)
+    }
+
+    func test_hudFollowsFocusedScreen_defaultsToTrue() {
+        XCTAssertTrue(SettingsStore(defaults: makeDefaults()).hudFollowsFocusedScreen)
+    }
+
+    func test_hudFollowsFocusedScreen_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hudFollowsFocusedScreen = false
+        XCTAssertFalse(SettingsStore(defaults: defaults).hudFollowsFocusedScreen)
+    }
 }

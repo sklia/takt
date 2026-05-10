@@ -13,6 +13,10 @@ final class SettingsStore {
     @ObservationIgnored private static let hasShownVoiceQualityNudgeKey = "hasShownVoiceQualityNudge"
     @ObservationIgnored private static let duckingLevelKey = "duckingLevel"
     @ObservationIgnored private static let pauseDuringFocusKey = "pauseDuringFocus"
+    @ObservationIgnored private static let showHUDKey = "showHUD"
+    @ObservationIgnored private static let hudStyleKey = "hudStyle"
+    @ObservationIgnored private static let hudPositionKey = "hudPosition"
+    @ObservationIgnored private static let hudFollowsFocusedScreenKey = "hudFollowsFocusedScreen"
     @ObservationIgnored private static let announceArtistKey = "announceArtist"
     @ObservationIgnored private static let announceTitleKey = "announceTitle"
     @ObservationIgnored private static let announceAlbumKey = "announceAlbum"
@@ -58,6 +62,22 @@ final class SettingsStore {
         didSet { defaults.set(pauseDuringFocus, forKey: Self.pauseDuringFocusKey) }
     }
 
+    var showHUD: Bool {
+        didSet { defaults.set(showHUD, forKey: Self.showHUDKey) }
+    }
+
+    var hudStyle: HUDStyle {
+        didSet { defaults.set(hudStyle.rawValue, forKey: Self.hudStyleKey) }
+    }
+
+    var hudPosition: HUDPosition {
+        didSet { defaults.set(hudPosition.rawValue, forKey: Self.hudPositionKey) }
+    }
+
+    var hudFollowsFocusedScreen: Bool {
+        didSet { defaults.set(hudFollowsFocusedScreen, forKey: Self.hudFollowsFocusedScreenKey) }
+    }
+
     var announceArtist: Bool {
         didSet { defaults.set(announceArtist, forKey: Self.announceArtistKey) }
     }
@@ -83,6 +103,16 @@ final class SettingsStore {
         self.duckingLevel = storedDuck ?? Self.defaultDuckingLevel
         let storedPause = defaults.object(forKey: Self.pauseDuringFocusKey) as? Bool
         self.pauseDuringFocus = storedPause ?? true
+        let storedHUD = defaults.object(forKey: Self.showHUDKey) as? Bool
+        self.showHUD = storedHUD ?? true
+        let storedStyle = defaults.string(forKey: Self.hudStyleKey)
+            .flatMap(HUDStyle.init(rawValue:))
+        self.hudStyle = storedStyle ?? .standard
+        let storedPosition = defaults.string(forKey: Self.hudPositionKey)
+            .flatMap(HUDPosition.init(rawValue:))
+        self.hudPosition = storedPosition ?? .topCenter
+        let storedFollows = defaults.object(forKey: Self.hudFollowsFocusedScreenKey) as? Bool
+        self.hudFollowsFocusedScreen = storedFollows ?? true
         let storedArtist = defaults.object(forKey: Self.announceArtistKey) as? Bool
         self.announceArtist = storedArtist ?? true
         let storedTitle = defaults.object(forKey: Self.announceTitleKey) as? Bool
