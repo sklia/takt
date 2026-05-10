@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/sklia/takt/compare/v0.5.0...v0.5.1) (2026-05-10)
+
+
+### Styles
+
+* fix up the settings UI ([#46](https://github.com/sklia/takt/issues/46)) ([a789712](https://github.com/sklia/takt/commit/a78971252d56696dea492f6ea688468c11a82f11))
+
 ## [0.5.0](https://github.com/sklia/takt/compare/v0.4.1...v0.5.0) (2026-05-09)
 
 
