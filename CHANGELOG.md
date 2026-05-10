@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/sklia/takt/compare/v0.5.1...v0.6.0) (2026-05-10)
+
+
+### Features
+
+* **narrator:** toggle-based announcement composition ([#48](https://github.com/sklia/takt/issues/48)) ([d79b6b9](https://github.com/sklia/takt/commit/d79b6b9f766aba7ee8584bd0d8bd5e606260217a))
+
 ## [0.5.1](https://github.com/sklia/takt/compare/v0.5.0...v0.5.1) (2026-05-10)
 
 
