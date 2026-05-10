@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/sklia/takt/compare/v0.7.1...v0.8.0) (2026-05-10)
+
+
+### Features
+
+* **settings:** reorganize into three tabs with new controls ([036b8fd](https://github.com/sklia/takt/commit/036b8fd6068946a92dd50f96949e77e3d7ff3128))
+
 ## [0.7.1](https://github.com/sklia/takt/compare/v0.7.0...v0.7.1) (2026-05-10)
 
 
