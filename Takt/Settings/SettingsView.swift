@@ -2,34 +2,7 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-struct SettingsView: View {
-    @Bindable var settings: SettingsStore
-    @Bindable var permission: PermissionStateStore
-    @Bindable var loginItem: LoginItemController
-    let voiceCatalog: VoiceCatalog
-    let preview: (SpeechSettings) -> Void
-
-    var body: some View {
-        TabView {
-            NarratorTab(
-                settings: settings,
-                permission: permission,
-                voiceCatalog: voiceCatalog,
-                preview: preview
-            )
-            .tabItem { Label("Narrator", systemImage: "waveform") }
-
-            GeneralTab(
-                settings: settings,
-                loginItem: loginItem
-            )
-            .tabItem { Label("General", systemImage: "gear") }
-        }
-        .frame(width: 450)
-    }
-}
-
-private struct NarratorTab: View {
+struct NarratorTab: View {
     @Bindable var settings: SettingsStore
     @Bindable var permission: PermissionStateStore
     let voiceCatalog: VoiceCatalog
@@ -78,10 +51,11 @@ private struct NarratorTab: View {
             }
         }
         .formStyle(.grouped)
+        .frame(width: 420)
     }
 }
 
-private struct GeneralTab: View {
+struct GeneralTab: View {
     @Bindable var settings: SettingsStore
     @Bindable var loginItem: LoginItemController
 
@@ -98,6 +72,7 @@ private struct GeneralTab: View {
             }
         }
         .formStyle(.grouped)
+        .frame(width: 420)
     }
 }
 
