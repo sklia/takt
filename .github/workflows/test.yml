@@ -2,10 +2,10 @@ name: Test
 
 on:
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - LICENSE
-      - .gitignore
+    paths:
+      - '**/*.swift'
+      - 'project.yml'
+      - '.github/workflows/test.yml'
 
 concurrency:
   group: test-${{ github.ref }}
@@ -21,10 +21,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      - name: Cache XcodeGen
+        id: cache-xcodegen
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/xcodegen
+          key: xcodegen-${{ runner.os }}
 
       - name: Install XcodeGen
+        if: steps.cache-xcodegen.outputs.cache-hit != 'true'
         run: brew install xcodegen
 
       - name: Generate Xcode project
