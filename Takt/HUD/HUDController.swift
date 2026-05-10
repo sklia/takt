@@ -6,9 +6,10 @@ final class HUDController {
     typealias StyleProvider = () -> HUDStyle
     typealias PositionProvider = () -> HUDPosition
     typealias ScreenProvider = () -> NSScreen?
+    typealias DismissDelayProvider = () -> TimeInterval
 
     private let artFetcher: AlbumArtFetcher
-    private let dismissDelay: TimeInterval
+    private let dismissDelayProvider: DismissDelayProvider
     private let styleProvider: StyleProvider
     private let positionProvider: PositionProvider
     private let screenProvider: ScreenProvider
@@ -26,14 +27,14 @@ final class HUDController {
     init(
         artFetcher: AlbumArtFetcher = AlbumArtFetcher(),
         debounce: Duration = .milliseconds(250),
-        dismissDelay: TimeInterval = 4,
+        dismissDelay: @escaping DismissDelayProvider = { 4 },
         style: @escaping StyleProvider = { .standard },
         position: @escaping PositionProvider = { .topCenter },
         screen: @escaping ScreenProvider = { .main }
     ) {
         self.artFetcher = artFetcher
         self.debounce = debounce
-        self.dismissDelay = dismissDelay
+        self.dismissDelayProvider = dismissDelay
         self.styleProvider = style
         self.positionProvider = position
         self.screenProvider = screen
@@ -115,8 +116,9 @@ final class HUDController {
 
     private func scheduleDismiss() {
         dismissTask?.cancel()
-        dismissTask = Task { [weak self, dismissDelay] in
-            try? await Task.sleep(for: .seconds(dismissDelay))
+        let delay = dismissDelayProvider()
+        dismissTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
             guard !Task.isCancelled else { return }
             self?.dismiss()
         }

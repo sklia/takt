@@ -20,9 +20,13 @@ final class SettingsStore {
     @ObservationIgnored private static let announceArtistKey = "announceArtist"
     @ObservationIgnored private static let announceTitleKey = "announceTitle"
     @ObservationIgnored private static let announceAlbumKey = "announceAlbum"
+    @ObservationIgnored private static let hudDismissDelayKey = "hudDismissDelay"
+    @ObservationIgnored private static let announcementDelayKey = "announcementDelay"
 
     static let defaultSpeechRate: Float = 0.52
     static let defaultDuckingLevel: Float = 0.25
+    static let defaultHUDDismissDelay: TimeInterval = 4.0
+    static let defaultAnnouncementDelay: TimeInterval = 0.0
 
     var narratorEnabled: Bool {
         didSet { defaults.set(narratorEnabled, forKey: Self.narratorEnabledKey) }
@@ -90,6 +94,14 @@ final class SettingsStore {
         didSet { defaults.set(announceAlbum, forKey: Self.announceAlbumKey) }
     }
 
+    var hudDismissDelay: TimeInterval {
+        didSet { defaults.set(hudDismissDelay, forKey: Self.hudDismissDelayKey) }
+    }
+
+    var announcementDelay: TimeInterval {
+        didSet { defaults.set(announcementDelay, forKey: Self.announcementDelayKey) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.narratorEnabled = defaults.bool(forKey: Self.narratorEnabledKey)
@@ -118,5 +130,9 @@ final class SettingsStore {
         let storedTitle = defaults.object(forKey: Self.announceTitleKey) as? Bool
         self.announceTitle = storedTitle ?? true
         self.announceAlbum = defaults.bool(forKey: Self.announceAlbumKey)
+        let storedDismiss = defaults.object(forKey: Self.hudDismissDelayKey) as? TimeInterval
+        self.hudDismissDelay = storedDismiss ?? Self.defaultHUDDismissDelay
+        let storedAnnounceDelay = defaults.object(forKey: Self.announcementDelayKey) as? TimeInterval
+        self.announcementDelay = storedAnnounceDelay ?? Self.defaultAnnouncementDelay
     }
 }

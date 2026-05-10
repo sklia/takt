@@ -47,6 +47,14 @@ final class SettingsWindow {
         narratorItem.image = NSImage(systemSymbolName: "waveform", accessibilityDescription: nil)
         tabVC.addTabViewItem(narratorItem)
 
+        let displayHost = NSHostingController(rootView: DisplayTab(settings: settings))
+        displayHost.title = "Takt Settings"
+        displayHost.sizingOptions = .preferredContentSize
+        let displayItem = NSTabViewItem(viewController: displayHost)
+        displayItem.label = "Display"
+        displayItem.image = NSImage(systemSymbolName: "rectangle.on.rectangle", accessibilityDescription: nil)
+        tabVC.addTabViewItem(displayItem)
+
         let generalHost = NSHostingController(rootView: GeneralTab(
             settings: settings,
             loginItem: loginItem
@@ -55,7 +63,7 @@ final class SettingsWindow {
         generalHost.sizingOptions = .preferredContentSize
         let generalItem = NSTabViewItem(viewController: generalHost)
         generalItem.label = "General"
-        generalItem.image = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: nil)
+        generalItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
         tabVC.addTabViewItem(generalItem)
 
         let window = NSWindow(contentViewController: tabVC)

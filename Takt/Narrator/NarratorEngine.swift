@@ -11,12 +11,14 @@ final class NarratorEngine {
     typealias SpeechSettingsProvider = () -> SpeechSettings
     typealias DuckingLevelProvider = () -> Float
     typealias FocusSuppressedProvider = () -> Bool
+    typealias AnnouncementDelayProvider = () -> Duration
     typealias PhraseComposer = (PlaybackEvent) -> String?
 
     private let speaker: any Speaker
     private let ducker: any Ducker
     private let duckingLevelProvider: DuckingLevelProvider
     private let focusSuppressed: FocusSuppressedProvider
+    private let announcementDelay: AnnouncementDelayProvider
     private let debounce: Duration
     private let speechTimeout: Duration
     private let phraseComposer: PhraseComposer
@@ -35,6 +37,7 @@ final class NarratorEngine {
         ducker: any Ducker,
         duckingLevel: @escaping DuckingLevelProvider = { 0.25 },
         focusSuppressed: @escaping FocusSuppressedProvider = { false },
+        announcementDelay: @escaping AnnouncementDelayProvider = { .zero },
         debounce: Duration = .milliseconds(250),
         speechTimeout: Duration = .seconds(10),
         phraseComposer: @escaping PhraseComposer = { "\($0.artist), \($0.title)" },
@@ -45,6 +48,7 @@ final class NarratorEngine {
         self.ducker = ducker
         self.duckingLevelProvider = duckingLevel
         self.focusSuppressed = focusSuppressed
+        self.announcementDelay = announcementDelay
         self.debounce = debounce
         self.speechTimeout = speechTimeout
         self.phraseComposer = phraseComposer
@@ -66,6 +70,14 @@ final class NarratorEngine {
             try await Task.sleep(for: debounce)
         } catch {
             return
+        }
+        let extraDelay = announcementDelay()
+        if extraDelay > .zero {
+            do {
+                try await Task.sleep(for: extraDelay)
+            } catch {
+                return
+            }
         }
         if focusSuppressed() { return }
         do {

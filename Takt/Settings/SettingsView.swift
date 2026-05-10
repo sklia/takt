@@ -15,10 +15,25 @@ struct NarratorTab: View {
                     PermissionBanner()
                 }
             }
+            Section {
+                Toggle("Narrator", isOn: $settings.narratorEnabled)
+            }
             Section("Announcement") {
                 Toggle("Artist", isOn: $settings.announceArtist)
                 Toggle("Title", isOn: $settings.announceTitle)
                 Toggle("Album", isOn: $settings.announceAlbum)
+            }
+            Section("Delay") {
+                HStack {
+                    Text("None")
+                        .foregroundStyle(.secondary)
+                    Slider(value: $settings.announcementDelay, in: 0...5, step: 0.5)
+                    Text("5s")
+                        .foregroundStyle(.secondary)
+                }
+                Text("Wait \(formattedDelay) before speaking")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             Section("Voice") {
                 VoicePicker(settings: settings, voiceCatalog: voiceCatalog)
@@ -33,7 +48,7 @@ struct NarratorTab: View {
                     }
                 }
             }
-            Section("Speech rate") {
+            Section("Speech") {
                 HStack {
                     Text("Slow")
                         .foregroundStyle(.secondary)
@@ -42,7 +57,7 @@ struct NarratorTab: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Section("Spotify volume while narrator speaks") {
+            Section("Volume ducking") {
                 HStack {
                     Text("0%")
                         .foregroundStyle(.secondary)
@@ -50,7 +65,7 @@ struct NarratorTab: View {
                     Text("100%")
                         .foregroundStyle(.secondary)
                 }
-                Text("Currently \(Int((settings.duckingLevel * 100).rounded()))%")
+                Text("Spotify plays at \(Int((settings.duckingLevel * 100).rounded()))% while speaking")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -58,15 +73,24 @@ struct NarratorTab: View {
         .formStyle(.grouped)
         .frame(width: 420)
     }
+
+    private var formattedDelay: String {
+        if settings.announcementDelay == 0 {
+            return "0s"
+        }
+        if settings.announcementDelay.truncatingRemainder(dividingBy: 1) == 0 {
+            return "\(Int(settings.announcementDelay))s"
+        }
+        return String(format: "%.1fs", settings.announcementDelay)
+    }
 }
 
-struct GeneralTab: View {
+struct DisplayTab: View {
     @Bindable var settings: SettingsStore
-    @Bindable var loginItem: LoginItemController
 
     var body: some View {
         Form {
-            Section("Display") {
+            Section("Overlay") {
                 Toggle("Show track overlay on song change", isOn: $settings.showHUD)
                 Picker("Style", selection: $settings.hudStyle) {
                     ForEach(HUDStyle.allCases, id: \.self) { style in
@@ -78,8 +102,41 @@ struct GeneralTab: View {
                         Text(position.label).tag(position)
                     }
                 }
+            }
+            Section("Duration") {
+                HStack {
+                    Text("2s")
+                        .foregroundStyle(.secondary)
+                    Slider(value: $settings.hudDismissDelay, in: 2...10, step: 0.5)
+                    Text("10s")
+                        .foregroundStyle(.secondary)
+                }
+                Text("Overlay stays for \(formattedDuration)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Screen") {
                 Toggle("Follow focused screen", isOn: $settings.hudFollowsFocusedScreen)
             }
+        }
+        .formStyle(.grouped)
+        .frame(width: 420)
+    }
+
+    private var formattedDuration: String {
+        if settings.hudDismissDelay.truncatingRemainder(dividingBy: 1) == 0 {
+            return "\(Int(settings.hudDismissDelay))s"
+        }
+        return String(format: "%.1fs", settings.hudDismissDelay)
+    }
+}
+
+struct GeneralTab: View {
+    @Bindable var settings: SettingsStore
+    @Bindable var loginItem: LoginItemController
+
+    var body: some View {
+        Form {
             Section("Hotkey") {
                 KeyboardShortcuts.Recorder("Toggle narrator", name: .toggleNarrator)
             }

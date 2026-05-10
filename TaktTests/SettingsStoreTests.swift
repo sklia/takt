@@ -131,6 +131,26 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertTrue(SettingsStore(defaults: defaults).announceAlbum)
     }
 
+    func test_hudDismissDelay_defaultsTo4() {
+        XCTAssertEqual(SettingsStore(defaults: makeDefaults()).hudDismissDelay, 4.0)
+    }
+
+    func test_hudDismissDelay_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).hudDismissDelay = 7.0
+        XCTAssertEqual(SettingsStore(defaults: defaults).hudDismissDelay, 7.0)
+    }
+
+    func test_announcementDelay_defaultsTo0() {
+        XCTAssertEqual(SettingsStore(defaults: makeDefaults()).announcementDelay, 0.0)
+    }
+
+    func test_announcementDelay_persistsAcrossInstances() {
+        let defaults = makeDefaults()
+        SettingsStore(defaults: defaults).announcementDelay = 2.5
+        XCTAssertEqual(SettingsStore(defaults: defaults).announcementDelay, 2.5)
+    }
+
     func test_hudStyle_defaultsToStandard() {
         XCTAssertEqual(SettingsStore(defaults: makeDefaults()).hudStyle, .standard)
     }

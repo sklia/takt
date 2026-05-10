@@ -90,6 +90,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 guard settings?.pauseDuringFocus == true else { return false }
                 return UserDefaults.standard.bool(forKey: "focusPauseActive")
             },
+            announcementDelay: { [weak settings] in
+                .seconds(settings?.announcementDelay ?? SettingsStore.defaultAnnouncementDelay)
+            },
             phraseComposer: phraseComposer,
             speechSettings: { [weak settings] in
                 guard let settings else { return SpeechSettings(voiceIdentifier: nil, rate: 0.5) }
@@ -125,6 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func buildHUDController() -> HUDController {
         let settings = self.settings
         return HUDController(
+            dismissDelay: { [weak settings] in settings?.hudDismissDelay ?? SettingsStore.defaultHUDDismissDelay },
             style: { [weak settings] in settings?.hudStyle ?? .standard },
             position: { [weak settings] in settings?.hudPosition ?? .topCenter },
             screen: { [weak settings] in
