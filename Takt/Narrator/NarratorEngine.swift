@@ -11,6 +11,7 @@ final class NarratorEngine {
     typealias SpeechSettingsProvider = () -> SpeechSettings
     typealias DuckingLevelProvider = () -> Float
     typealias FocusSuppressedProvider = () -> Bool
+    typealias PhraseComposer = (PlaybackEvent) -> String?
 
     private let speaker: any Speaker
     private let ducker: any Ducker
@@ -18,6 +19,7 @@ final class NarratorEngine {
     private let focusSuppressed: FocusSuppressedProvider
     private let debounce: Duration
     private let speechTimeout: Duration
+    private let phraseComposer: PhraseComposer
     private let speechSettings: SpeechSettingsProvider
     private let permissionStateChangeHandler: ((PermissionState) -> Void)?
     private var lastAnnouncedURI: String?
@@ -35,6 +37,7 @@ final class NarratorEngine {
         focusSuppressed: @escaping FocusSuppressedProvider = { false },
         debounce: Duration = .milliseconds(250),
         speechTimeout: Duration = .seconds(10),
+        phraseComposer: @escaping PhraseComposer = { "\($0.artist), \($0.title)" },
         speechSettings: @escaping SpeechSettingsProvider = { SpeechSettings(voiceIdentifier: nil, rate: 0.5) },
         permissionStateChangeHandler: ((PermissionState) -> Void)? = nil
     ) {
@@ -44,6 +47,7 @@ final class NarratorEngine {
         self.focusSuppressed = focusSuppressed
         self.debounce = debounce
         self.speechTimeout = speechTimeout
+        self.phraseComposer = phraseComposer
         self.speechSettings = speechSettings
         self.permissionStateChangeHandler = permissionStateChangeHandler
     }
@@ -71,7 +75,10 @@ final class NarratorEngine {
             return
         }
         transition(to: .granted)
-        let phrase = "\(event.artist), \(event.title)"
+        guard let phrase = phraseComposer(event) else {
+            try? ducker.restore()
+            return
+        }
         let settings = speechSettings()
         await withTaskCancellationHandler {
             await withTaskGroup(of: Void.self) { group in

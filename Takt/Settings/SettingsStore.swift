@@ -13,6 +13,9 @@ final class SettingsStore {
     @ObservationIgnored private static let hasShownVoiceQualityNudgeKey = "hasShownVoiceQualityNudge"
     @ObservationIgnored private static let duckingLevelKey = "duckingLevel"
     @ObservationIgnored private static let pauseDuringFocusKey = "pauseDuringFocus"
+    @ObservationIgnored private static let announceArtistKey = "announceArtist"
+    @ObservationIgnored private static let announceTitleKey = "announceTitle"
+    @ObservationIgnored private static let announceAlbumKey = "announceAlbum"
 
     static let defaultSpeechRate: Float = 0.52
     static let defaultDuckingLevel: Float = 0.25
@@ -55,6 +58,18 @@ final class SettingsStore {
         didSet { defaults.set(pauseDuringFocus, forKey: Self.pauseDuringFocusKey) }
     }
 
+    var announceArtist: Bool {
+        didSet { defaults.set(announceArtist, forKey: Self.announceArtistKey) }
+    }
+
+    var announceTitle: Bool {
+        didSet { defaults.set(announceTitle, forKey: Self.announceTitleKey) }
+    }
+
+    var announceAlbum: Bool {
+        didSet { defaults.set(announceAlbum, forKey: Self.announceAlbumKey) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.narratorEnabled = defaults.bool(forKey: Self.narratorEnabledKey)
@@ -68,5 +83,10 @@ final class SettingsStore {
         self.duckingLevel = storedDuck ?? Self.defaultDuckingLevel
         let storedPause = defaults.object(forKey: Self.pauseDuringFocusKey) as? Bool
         self.pauseDuringFocus = storedPause ?? true
+        let storedArtist = defaults.object(forKey: Self.announceArtistKey) as? Bool
+        self.announceArtist = storedArtist ?? true
+        let storedTitle = defaults.object(forKey: Self.announceTitleKey) as? Bool
+        self.announceTitle = storedTitle ?? true
+        self.announceAlbum = defaults.bool(forKey: Self.announceAlbumKey)
     }
 }

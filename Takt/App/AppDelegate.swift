@@ -35,12 +35,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard settings?.pauseDuringFocus == true else { return false }
             return UserDefaults.standard.bool(forKey: "focusPauseActive")
         }
+        let phraseComposer: NarratorEngine.PhraseComposer = { [weak settings] event in
+            guard let settings else { return "\(event.artist), \(event.title)" }
+            var parts: [String] = []
+            if settings.announceArtist { parts.append(event.artist) }
+            if settings.announceTitle { parts.append(event.title) }
+            if settings.announceAlbum, let album = event.album { parts.append(album) }
+            return parts.isEmpty ? nil : parts.joined(separator: ", ")
+        }
         let ducker = SpotifyDucker()
         let engine = NarratorEngine(
             speaker: AVSpeechSpeaker(),
             ducker: ducker,
             duckingLevel: duckingLevelProvider,
             focusSuppressed: focusSuppressed,
+            phraseComposer: phraseComposer,
             speechSettings: speechSettings,
             permissionStateChangeHandler: { [weak permissionStore] newState in
                 permissionStore?.state = newState
@@ -64,10 +73,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             permission: permissionStore,
             loginItem: loginItem,
             voiceCatalog: voiceCatalog,
-            preview: { [weak previewSpeaker] speech in
+            preview: { [weak previewSpeaker, phraseComposer] speech in
                 guard let previewSpeaker else { return }
+                let sample = PlaybackEvent(
+                    artist: "Daft Punk", title: "Get Lucky",
+                    album: "Random Access Memories", uri: ""
+                )
+                guard let phrase = phraseComposer(sample) else { return }
                 Task {
-                    await previewSpeaker.speak("Daft Punk, Get Lucky", settings: speech)
+                    await previewSpeaker.speak(phrase, settings: speech)
                 }
             }
         )

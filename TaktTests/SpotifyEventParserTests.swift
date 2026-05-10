@@ -16,6 +16,21 @@ final class SpotifyEventParserTests: XCTestCase {
             PlaybackEvent(
                 artist: "Daft Punk",
                 title: "Get Lucky",
+                album: "Random Access Memories",
+                uri: "spotify:track:69kOkLUCkxIZYexIgSG8rq"
+            )
+        )
+    }
+
+    func test_parse_missingAlbum_returnsEventWithNilAlbum() {
+        var userInfo = Self.fullUserInfo
+        userInfo.removeValue(forKey: "Album")
+        XCTAssertEqual(
+            SpotifyEventParser.parse(userInfo),
+            PlaybackEvent(
+                artist: "Daft Punk",
+                title: "Get Lucky",
+                album: nil,
                 uri: "spotify:track:69kOkLUCkxIZYexIgSG8rq"
             )
         )
