@@ -47,7 +47,10 @@ private struct WelcomeView: View {
             Text("Welcome to Takt")
                 .font(.title2)
                 .bold()
-            Text("Takt narrates Spotify track changes. The first time you turn on the narrator, macOS will ask for permission to control Spotify's volume.")
+            Text(
+                "Takt narrates Spotify track changes. " +
+                "The first time you turn on the narrator, macOS will ask for permission to control Spotify's volume."
+            )
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             Button("Got it", action: onDismiss)

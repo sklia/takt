@@ -61,8 +61,7 @@ struct HUDView: View {
             }
         }
         .padding(14)
-        .frame(maxWidth: 340, alignment: .leading)
-        .fixedSize(horizontal: true, vertical: false)
+        .frame(width: 340, alignment: .leading)
         .glassEffect(.regular, in: .capsule)
     }
 

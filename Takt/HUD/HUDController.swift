@@ -80,11 +80,11 @@ final class HUDController {
         hostingView.wantsLayer = true
         hostingView.layer?.backgroundColor = .clear
         hostingView.setFrameSize(hostingView.fittingSize)
-        let p = HUDPanel(contentRect: NSRect(origin: .zero, size: hostingView.fittingSize))
-        p.contentView = hostingView
-        self.panel = p
+        let newPanel = HUDPanel(contentRect: NSRect(origin: .zero, size: hostingView.fittingSize))
+        newPanel.contentView = hostingView
+        self.panel = newPanel
         self.activeStyle = currentStyle
-        return p
+        return newPanel
     }
 
     private func positionPanel(_ panel: HUDPanel) {
@@ -94,7 +94,7 @@ final class HUDController {
         let margin: CGFloat = 16
         let position = positionProvider()
 
-        let x: CGFloat = switch position {
+        let originX: CGFloat = switch position {
         case .topLeft, .bottomLeft:
             frame.minX + margin
         case .topCenter, .bottomCenter:
@@ -103,14 +103,14 @@ final class HUDController {
             frame.maxX - size.width - margin
         }
 
-        let y: CGFloat = switch position {
+        let originY: CGFloat = switch position {
         case .topLeft, .topCenter, .topRight:
             frame.maxY - size.height - margin
         case .bottomLeft, .bottomCenter, .bottomRight:
             frame.minY + margin
         }
 
-        panel.setFrameOrigin(NSPoint(x: x, y: y))
+        panel.setFrameOrigin(NSPoint(x: originX, y: originY))
     }
 
     private func scheduleDismiss() {

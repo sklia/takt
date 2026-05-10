@@ -11,9 +11,9 @@ final class CallLog: @unchecked Sendable {
     }
     private let lock = NSLock()
     private var entries: [Call] = []
-    func record(_ c: Call) {
+    func record(_ call: Call) {
         lock.lock(); defer { lock.unlock() }
-        entries.append(c)
+        entries.append(call)
     }
     func snapshot() -> [Call] {
         lock.lock(); defer { lock.unlock() }
@@ -48,11 +48,11 @@ final class DuckerSpy: Ducker {
     var restoreError: Error?
     init(log: CallLog) { self.log = log }
     func duck(to level: Float) throws {
-        if let e = duckError { throw e }
+        if let error = duckError { throw error }
         log.record(.duck(level))
     }
     func restore() throws {
-        if let e = restoreError { throw e }
+        if let error = restoreError { throw error }
         log.record(.restore)
     }
 }

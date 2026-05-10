@@ -50,7 +50,8 @@ final class VoiceQualityNudge {
     private func presentAlert() {
         let alert = NSAlert()
         alert.messageText = "Use a Siri voice for clearer narration"
-        alert.informativeText = "Takt is using a standard voice. Install a Siri voice via System Settings → Spoken Content for better announcements."
+        alert.informativeText = "Takt is using a standard voice. " +
+            "Install a Siri voice via System Settings > Spoken Content for better announcements."
         alert.addButton(withTitle: "Open Settings")
         alert.addButton(withTitle: "Use anyway")
         NSApp.activate()

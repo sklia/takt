@@ -138,7 +138,9 @@ private struct VoicePicker: View {
 }
 
 private struct PermissionBanner: View {
-    private static let automationSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")
+    private static let automationSettingsURL = URL(
+        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"
+    )
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
