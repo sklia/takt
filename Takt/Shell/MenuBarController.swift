@@ -3,7 +3,7 @@ import Observation
 import Sparkle
 
 @MainActor
-final class MenuBarController {
+final class MenuBarController: NSObject, NSMenuDelegate {
     private let statusItem: NSStatusItem
     private let settings: SettingsStore
     private let permission: PermissionStateStore
@@ -21,6 +21,7 @@ final class MenuBarController {
         self.updater = updater
         self.openSettingsAction = openSettings
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        super.init()
         configureButton()
         applyIcon()
         observeState()
@@ -81,9 +82,15 @@ final class MenuBarController {
             keyEquivalent: "q"
         ))
 
+        menu.delegate = self
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
-        statusItem.menu = nil
+    }
+
+    nonisolated func menuDidClose(_ menu: NSMenu) {
+        MainActor.assumeIsolated {
+            statusItem.menu = nil
+        }
     }
 
     @objc private func toggleNarrator() {
