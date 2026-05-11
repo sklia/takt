@@ -79,5 +79,16 @@
                  length="1951447"
                  type="application/octet-stream"/>
     </item>
+    <item>
+      <title>Version 0.8.1</title>
+      <pubDate>Mon, 11 May 2026 18:37:11 +0000</pubDate>
+      <sparkle:version>0.8.1</sparkle:version>
+      <sparkle:shortVersionString>0.8.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/sklia/takt/releases/download/v0.8.1/Takt.dmg"
+                 sparkle:edSignature="3GX8kxaCpp1upV0SozU+IGuDu3h96gLZN7inOyaJmiLC5YX//UJ+6wGbW3xugLUOoPmahBXdsJ2XbmU/GMT7Dw=="
+                 length="1954320"
+                 type="application/octet-stream"/>
+    </item>
   </channel>
 </rss>
