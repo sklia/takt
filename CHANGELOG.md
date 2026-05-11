@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/sklia/takt/compare/v0.8.0...v0.8.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* resolve race condition in menu bar click handling ([20636ef](https://github.com/sklia/takt/commit/20636effd60d7cc56665e357d2496a2ffbfd8004))
+
 ## [0.8.0](https://github.com/sklia/takt/compare/v0.7.1...v0.8.0) (2026-05-10)
 
 
