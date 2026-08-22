@@ -24,7 +24,7 @@ jobs:
       KEYCHAIN_PASSWORD: build-keychain 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
 
