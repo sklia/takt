@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/sklia/takt/compare/v0.8.1...v0.8.2) (2026-08-22)
+
+
+### CI
+
+* **deps:** bump the actions group across 1 directory with 2 updates ([#57](https://github.com/sklia/takt/issues/57)) ([cd2406c](https://github.com/sklia/takt/commit/cd2406c44271dd234cfd11bb3172d1b9a358f286))
+
 ## [0.8.1](https://github.com/sklia/takt/compare/v0.8.0...v0.8.1) (2026-05-11)
 
 
